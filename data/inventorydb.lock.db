@@ -1,6 +1,6 @@
 #FileLock
-#Tue Jun 23 22:14:58 IST 2026
+#Wed Jun 24 20:56:34 IST 2026
 hostName=LAPTOP-GCOSCQI7
-id=19ef55ee9b6b32b232db068f8781780592ccad98894
+id=19efa3d7c2e0328814590cb824ce8222ad09ec8c330
 method=file
-server=10.127.96.28\:51379
+server=10.14.121.28\:49329
