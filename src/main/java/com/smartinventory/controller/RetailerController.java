@@ -108,8 +108,8 @@ public class RetailerController {
 
     @GetMapping("/supplier-match")
     public ResponseEntity<ApiResponse<List<SupplierMatchResponse>>> searchByProduct(
-            @RequestParam String product) {
-        List<SupplierMatchResponse> list = supplierInvRepo.searchByProductName(product)
+            @RequestParam("productId") Long productId) {
+        List<SupplierMatchResponse> list = supplierInvRepo.findByProductId(productId)
             .stream().map(this::toMatchResponse).collect(Collectors.toList());
         return ResponseEntity.ok(ApiResponse.ok("Matches", list));
     }
