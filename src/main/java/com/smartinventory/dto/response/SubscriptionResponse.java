@@ -9,4 +9,5 @@ public class SubscriptionResponse {
     private String        status;
     private LocalDateTime startDateTime;
     private LocalDateTime endDateTime;
+    private java.util.List<String> unexpiredPlans;
 }

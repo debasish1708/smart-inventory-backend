@@ -417,26 +417,50 @@ public class RetailerController {
         return ResponseEntity.ok(ApiResponse.ok("Order created successfully", toOrderResponse(order)));
     }
 
+    private List<String> getUnexpiredPlanNames(User user) {
+        return subRepo.findByUserId(user.getId()).stream()
+                .filter(s -> s.getEndDateTime() != null && s.getEndDateTime().isAfter(LocalDateTime.now()))
+                .map(s -> s.getPlanName().name())
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+    @GetMapping("/subscription")
+    public ResponseEntity<ApiResponse<SubscriptionResponse>> getSubscription(Authentication auth) {
+        User user = getUser(auth);
+        List<String> unexpired = getUnexpiredPlanNames(user);
+        return subRepo.findTopByUserIdOrderByStartDateTimeDesc(user.getId())
+            .map(s -> ResponseEntity.ok(ApiResponse.ok("Subscription", SubscriptionResponse.builder()
+                .id(s.getId()).planName(s.getPlanName().name()).status(s.getStatus())
+                .startDateTime(s.getStartDateTime()).endDateTime(s.getEndDateTime())
+                .unexpiredPlans(unexpired).build())))
+            .orElse(ResponseEntity.ok(ApiResponse.ok("No subscription", SubscriptionResponse.builder()
+                .unexpiredPlans(unexpired).build())));
+    }
+
     @PostMapping("/subscription/upgrade")
     @org.springframework.transaction.annotation.Transactional
     public ResponseEntity<ApiResponse<SubscriptionResponse>> upgradeSubscription(
             Authentication auth, @RequestParam("plan") String planName) {
         User user = getUser(auth);
         
-        BigDecimal amount = BigDecimal.ZERO;
-        if ("BASIC".equalsIgnoreCase(planName)) amount = BigDecimal.valueOf(499);
-        else if ("PREMIUM".equalsIgnoreCase(planName)) amount = BigDecimal.valueOf(1499);
+        java.util.Optional<Subscription> activeSub = subRepo.findTopByUserIdOrderByStartDateTimeDesc(user.getId())
+                .filter(s -> "ACTIVE".equalsIgnoreCase(s.getStatus()) && s.getEndDateTime().isAfter(LocalDateTime.now()));
+        if (activeSub.isPresent() && activeSub.get().getPlanName().name().equalsIgnoreCase(planName)) {
+            throw new BadRequestException("You already have an active subscription for the " + planName + " plan.");
+        }
         
-        Payment payment = Payment.builder()
-                .user(user)
-                .amount(amount)
-                .paymentGateway("SIMULATION")
-                .transactionId("TXN-" + System.currentTimeMillis())
-                .status("SUCCESS")
-                .build();
-        paymentRepo.save(payment);
+        List<Subscription> userSubs = subRepo.findByUserId(user.getId());
+        
+        // Find existing unexpired subscription for this plan
+        java.util.Optional<Subscription> unexpiredSub = userSubs.stream()
+                .filter(s -> s.getPlanName().name().equalsIgnoreCase(planName) && s.getEndDateTime().isAfter(LocalDateTime.now()))
+                .findFirst();
 
-        List<Subscription> activeSubs = subRepo.findByUserId(user.getId()).stream()
+        Subscription sub;
+        
+        // Mark all currently active ones to EXPIRED
+        List<Subscription> activeSubs = userSubs.stream()
                 .filter(s -> "ACTIVE".equalsIgnoreCase(s.getStatus()))
                 .collect(Collectors.toList());
         for (Subscription s : activeSubs) {
@@ -444,22 +468,45 @@ public class RetailerController {
             subRepo.save(s);
         }
 
-        Subscription sub = Subscription.builder()
-                .user(user)
-                .payment(payment)
-                .planName(SubscriptionPlan.valueOf(planName.toUpperCase()))
-                .status("ACTIVE")
-                .startDateTime(LocalDateTime.now())
-                .endDateTime(LocalDateTime.now().plusMonths(1))
-                .build();
-        subRepo.save(sub);
+        if (unexpiredSub.isPresent()) {
+            // Reactivate existing unexpired plan without payment
+            sub = unexpiredSub.get();
+            sub.setStatus("ACTIVE");
+            subRepo.save(sub);
+        } else {
+            // Normal charge and new subscription
+            BigDecimal amount = BigDecimal.ZERO;
+            if ("BASIC".equalsIgnoreCase(planName)) amount = BigDecimal.valueOf(499);
+            else if ("PREMIUM".equalsIgnoreCase(planName)) amount = BigDecimal.valueOf(1499);
+            
+            Payment payment = Payment.builder()
+                    .user(user)
+                    .amount(amount)
+                    .paymentGateway("SIMULATION")
+                    .transactionId("TXN-" + System.currentTimeMillis())
+                    .status("SUCCESS")
+                    .build();
+            paymentRepo.save(payment);
 
+            sub = Subscription.builder()
+                    .user(user)
+                    .payment(payment)
+                    .planName(SubscriptionPlan.valueOf(planName.toUpperCase()))
+                    .status("ACTIVE")
+                    .startDateTime(LocalDateTime.now())
+                    .endDateTime(LocalDateTime.now().plusMonths(1))
+                    .build();
+            subRepo.save(sub);
+        }
+
+        List<String> unexpired = getUnexpiredPlanNames(user);
         SubscriptionResponse resp = SubscriptionResponse.builder()
                 .id(sub.getId())
                 .planName(sub.getPlanName().name())
                 .status(sub.getStatus())
                 .startDateTime(sub.getStartDateTime())
                 .endDateTime(sub.getEndDateTime())
+                .unexpiredPlans(unexpired)
                 .build();
         return ResponseEntity.ok(ApiResponse.ok("Subscription upgraded successfully", resp));
     }
