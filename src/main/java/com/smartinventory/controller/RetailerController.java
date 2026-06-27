@@ -153,15 +153,7 @@ public class RetailerController {
 
     // ── SUBSCRIPTION ───────────────────────────────────────────────────────
 
-    @GetMapping("/subscription")
-    public ResponseEntity<ApiResponse<SubscriptionResponse>> getSubscription(Authentication auth) {
-        User user = getUser(auth);
-        return subRepo.findTopByUserIdOrderByStartDateTimeDesc(user.getId())
-            .map(s -> ResponseEntity.ok(ApiResponse.ok("Subscription", SubscriptionResponse.builder()
-                .id(s.getId()).planName(s.getPlanName().name()).status(s.getStatus())
-                .startDateTime(s.getStartDateTime()).endDateTime(s.getEndDateTime()).build())))
-            .orElse(ResponseEntity.ok(ApiResponse.ok("No subscription", null)));
-    }
+
 
     // ── ANALYTICS ──────────────────────────────────────────────────────────
 
@@ -429,7 +421,19 @@ public class RetailerController {
     public ResponseEntity<ApiResponse<SubscriptionResponse>> getSubscription(Authentication auth) {
         User user = getUser(auth);
         List<String> unexpired = getUnexpiredPlanNames(user);
-        return subRepo.findTopByUserIdOrderByStartDateTimeDesc(user.getId())
+        List<Subscription> userSubs = subRepo.findByUserId(user.getId());
+        
+        java.util.Optional<Subscription> currentSubOpt = userSubs.stream()
+                .filter(s -> "ACTIVE".equalsIgnoreCase(s.getStatus()))
+                .findFirst();
+                
+        if (!currentSubOpt.isPresent()) {
+            currentSubOpt = userSubs.stream()
+                    .filter(s -> s.getStartDateTime() != null)
+                    .max(java.util.Comparator.comparing(Subscription::getStartDateTime));
+        }
+
+        return currentSubOpt
             .map(s -> ResponseEntity.ok(ApiResponse.ok("Subscription", SubscriptionResponse.builder()
                 .id(s.getId()).planName(s.getPlanName().name()).status(s.getStatus())
                 .startDateTime(s.getStartDateTime()).endDateTime(s.getEndDateTime())
@@ -444,13 +448,14 @@ public class RetailerController {
             Authentication auth, @RequestParam("plan") String planName) {
         User user = getUser(auth);
         
-        java.util.Optional<Subscription> activeSub = subRepo.findTopByUserIdOrderByStartDateTimeDesc(user.getId())
-                .filter(s -> "ACTIVE".equalsIgnoreCase(s.getStatus()) && s.getEndDateTime().isAfter(LocalDateTime.now()));
+        List<Subscription> userSubs = subRepo.findByUserId(user.getId());
+        
+        java.util.Optional<Subscription> activeSub = userSubs.stream()
+                .filter(s -> "ACTIVE".equalsIgnoreCase(s.getStatus()) && s.getEndDateTime().isAfter(LocalDateTime.now()))
+                .findFirst();
         if (activeSub.isPresent() && activeSub.get().getPlanName().name().equalsIgnoreCase(planName)) {
             throw new BadRequestException("You already have an active subscription for the " + planName + " plan.");
         }
-        
-        List<Subscription> userSubs = subRepo.findByUserId(user.getId());
         
         // Find existing unexpired subscription for this plan
         java.util.Optional<Subscription> unexpiredSub = userSubs.stream()
