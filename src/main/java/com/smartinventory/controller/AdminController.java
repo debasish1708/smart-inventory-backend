@@ -35,10 +35,34 @@ public class AdminController {
     private final OrderRepository        orderRepository;
     private final OrderItemRepository    orderItemRepository;
 
+    @lombok.Data @lombok.Builder
+    public static class AdminUserResponse {
+        private Long id;
+        private String email;
+        private String role;
+        private String status;
+        private String profileStatus;
+        private LocalDateTime createdAt;
+        private String profileImageUrl;
+    }
+
     @GetMapping("/pending-users")
-    public ResponseEntity<ApiResponse<List<User>>> getPendingUsers() {
-        return ResponseEntity.ok(ApiResponse.ok("Pending users",
-                userRepository.findByStatus(UserStatus.PENDING)));
+    public ResponseEntity<ApiResponse<List<AdminUserResponse>>> getPendingUsers() {
+        List<AdminUserResponse> list = userRepository.findByStatus(UserStatus.PENDING).stream().map(user -> {
+            String imgUrl = profileRepository.findByUserId(user.getId())
+                    .map(Profile::getProfileImageUrl)
+                    .orElse(null);
+            return AdminUserResponse.builder()
+                    .id(user.getId())
+                    .email(user.getEmail())
+                    .role(user.getRole().name())
+                    .status(user.getStatus().name())
+                    .profileStatus(user.getProfileStatus().name())
+                    .createdAt(user.getCreatedAt())
+                    .profileImageUrl(imgUrl)
+                    .build();
+        }).collect(Collectors.toList());
+        return ResponseEntity.ok(ApiResponse.ok("Pending users", list));
     }
 
     @GetMapping("/users")
@@ -47,8 +71,22 @@ public class AdminController {
     }
 
     @GetMapping("/all-users-raw")
-    public ResponseEntity<ApiResponse<List<User>>> getAllUsersRaw() {
-        return ResponseEntity.ok(ApiResponse.ok("All users", userRepository.findAll()));
+    public ResponseEntity<ApiResponse<List<AdminUserResponse>>> getAllUsersRaw() {
+        List<AdminUserResponse> list = userRepository.findAll().stream().map(user -> {
+            String imgUrl = profileRepository.findByUserId(user.getId())
+                    .map(Profile::getProfileImageUrl)
+                    .orElse(null);
+            return AdminUserResponse.builder()
+                    .id(user.getId())
+                    .email(user.getEmail())
+                    .role(user.getRole().name())
+                    .status(user.getStatus().name())
+                    .profileStatus(user.getProfileStatus().name())
+                    .createdAt(user.getCreatedAt())
+                    .profileImageUrl(imgUrl)
+                    .build();
+        }).collect(Collectors.toList());
+        return ResponseEntity.ok(ApiResponse.ok("All users", list));
     }
 
     @PutMapping("/approve/{userId}")

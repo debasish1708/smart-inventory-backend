@@ -48,6 +48,39 @@ public class ProfileService {
         return toResponse(user, profile);
     }
 
+    @Transactional
+    public ProfileResponse uploadProfileImage(String email, org.springframework.web.multipart.MultipartFile file) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new BadRequestException("User not found"));
+        Profile profile = profileRepository.findByUserId(user.getId())
+                .orElseGet(() -> Profile.builder().user(user).build());
+
+        String subFolder = user.getRole() == com.smartinventory.enums.Role.RETAILER ? "retailers" : "suppliers";
+        String baseDir = "images/profile/" + subFolder;
+        java.io.File directory = new java.io.File(System.getProperty("user.dir"), baseDir);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+
+        String originalFilename = file.getOriginalFilename();
+        String ext = "";
+        if (originalFilename != null && originalFilename.contains(".")) {
+            ext = originalFilename.substring(originalFilename.lastIndexOf("."));
+        }
+        String uniqueFilename = user.getId() + "_" + System.currentTimeMillis() + ext;
+        java.io.File destFile = new java.io.File(directory, uniqueFilename);
+        try {
+            file.transferTo(destFile);
+        } catch (Exception e) {
+            throw new BadRequestException("Failed to save image file: " + e.getMessage());
+        }
+
+        profile.setProfileImageUrl(uniqueFilename);
+        profileRepository.save(profile);
+
+        return toResponse(user, profile);
+    }
+
     public ProfileResponse getMyProfile(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new BadRequestException("User not found"));
