@@ -2,6 +2,7 @@ package com.smartinventory.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.util.List;
 
 @Entity
 @Table(name = "ratings")
@@ -24,4 +25,7 @@ public class Rating extends BaseEntity {
 
     @Column(columnDefinition = "TEXT")
     private String review;
+
+    @OneToMany(mappedBy = "rating", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<RatingImage> images;
 }
