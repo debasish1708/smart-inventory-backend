@@ -1,10 +1,12 @@
 package com.smartinventory.controller;
 
 import com.smartinventory.dto.request.InventoryRequest;
+import com.smartinventory.dto.request.SaleRequest;
 import com.smartinventory.dto.response.*;
 import com.smartinventory.entity.*;
 import com.smartinventory.exception.BadRequestException;
 import com.smartinventory.repository.*;
+import com.smartinventory.scheduler.LowStockScheduler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,6 +15,9 @@ import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,6 +39,10 @@ public class RetailerController {
     private final ProductRepository           productRepo;
     private final CategoryRepository          categoryRepo;
     private final ProfileRepository           profileRepo;
+    private final RetailerSaleRepository      saleRepo;
+    private final RetailerSaleItemRepository  saleItemRepo;
+    private final RetailerSalesAnalyticsRepository salesAnalyticsRepo;
+    private final LowStockScheduler           lowStockScheduler;
 
     private User getUser(Authentication auth) {
         return userRepo.findByEmail(auth.getName())
@@ -208,7 +217,9 @@ public class RetailerController {
         String unit        = i.getProduct() != null ? i.getProduct().getUnit()  : null;
         String sku         = i.getProduct() != null ? i.getProduct().getSku()   : null;
         return InventoryResponse.builder()
-            .id(i.getId()).productName(productName).category(category)
+            .id(i.getId())
+            .productId(i.getProduct() != null ? i.getProduct().getId() : null)
+            .productName(productName).category(category)
             .brand(brand).unit(unit).sku(sku).price(i.getPrice())
             .quantity(i.getQuantity()).thresholdValue(i.getThresholdValue())
             .build();
@@ -246,5 +257,115 @@ public class RetailerController {
             .price(si.getPrice()).moq(si.getMoq())
             .stockQuantity(si.getStockQuantity()).leadTime(si.getLeadTime())
             .rating(avgRating != null ? avgRating : 0.0).build();
+    }
+
+    // ── SALES & TRANSACTIONS ───────────────────────────────────────────────
+
+    @PostMapping("/sales")
+    @org.springframework.transaction.annotation.Transactional
+    public ResponseEntity<ApiResponse<SaleResponse>> checkoutSale(
+            Authentication auth, @RequestBody SaleRequest req) {
+        User user = getUser(auth);
+
+        if (req.getItems() == null || req.getItems().isEmpty()) {
+            throw new BadRequestException("Cart is empty");
+        }
+
+        BigDecimal totalAmount = BigDecimal.ZERO;
+        List<RetailerSaleItem> saleItems = new ArrayList<>();
+        List<RetailerInventory> updatedInventories = new ArrayList<>();
+        List<RetailerSalesAnalytics> analyticsLogs = new ArrayList<>();
+
+        for (SaleRequest.SaleItemRequest itemReq : req.getItems()) {
+            Product product = productRepo.findById(itemReq.getProductId())
+                    .orElseThrow(() -> new BadRequestException("Product not found: " + itemReq.getProductId()));
+
+            RetailerInventory invItem = invRepo.findAll().stream()
+                    .filter(i -> i.getUser() != null && i.getUser().getId().equals(user.getId()) 
+                              && i.getProduct() != null && i.getProduct().getId().equals(product.getId()))
+                    .findFirst()
+                    .orElseThrow(() -> new BadRequestException("Product '" + product.getName() + "' is not configured in your inventory."));
+
+            if (invItem.getQuantity() < itemReq.getQuantity()) {
+                throw new BadRequestException("Insufficient stock for product '" + product.getName() + "'. Available: " + invItem.getQuantity() + ", requested: " + itemReq.getQuantity());
+            }
+
+            invItem.setQuantity(invItem.getQuantity() - itemReq.getQuantity());
+            updatedInventories.add(invItem);
+
+            BigDecimal itemPrice = invItem.getPrice() != null ? invItem.getPrice() : BigDecimal.ZERO;
+            BigDecimal itemTotal = itemPrice.multiply(BigDecimal.valueOf(itemReq.getQuantity()));
+            totalAmount = totalAmount.add(itemTotal);
+
+            RetailerSaleItem saleItem = RetailerSaleItem.builder()
+                    .product(product)
+                    .quantity(itemReq.getQuantity())
+                    .price(itemPrice)
+                    .unit(product.getUnit())
+                    .build();
+            saleItems.add(saleItem);
+
+            RetailerSalesAnalytics analytics = RetailerSalesAnalytics.builder()
+                    .product(product)
+                    .user(user)
+                    .date(LocalDate.now())
+                    .quantity(itemReq.getQuantity())
+                    .price(itemPrice)
+                    .totalValue(itemTotal)
+                    .build();
+            analyticsLogs.add(analytics);
+        }
+
+        RetailerSale sale = RetailerSale.builder()
+                .retailer(user)
+                .totalAmount(totalAmount)
+                .saleDate(LocalDateTime.now())
+                .build();
+
+        for (RetailerSaleItem saleItem : saleItems) {
+            saleItem.setRetailerSale(sale);
+        }
+        sale.setItems(saleItems);
+
+        saleRepo.save(sale);
+        invRepo.saveAll(updatedInventories);
+        salesAnalyticsRepo.saveAll(analyticsLogs);
+
+        for (RetailerInventory invItem : updatedInventories) {
+            lowStockScheduler.checkSingleItemLowStock(invItem);
+        }
+
+        return ResponseEntity.ok(ApiResponse.ok("Sale transaction successful", toSaleResponse(sale)));
+    }
+
+    @GetMapping("/sales")
+    public ResponseEntity<ApiResponse<List<SaleResponse>>> getSales(Authentication auth) {
+        User user = getUser(auth);
+        List<SaleResponse> list = saleRepo.findByRetailerIdOrderBySaleDateDesc(user.getId())
+                .stream()
+                .map(this::toSaleResponse)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(ApiResponse.ok("Sales list fetched successfully", list));
+    }
+
+    private SaleResponse toSaleResponse(RetailerSale sale) {
+        List<SaleResponse.SaleItemResponse> items = sale.getItems().stream()
+                .map(i -> SaleResponse.SaleItemResponse.builder()
+                        .id(i.getId())
+                        .productId(i.getProduct() != null ? i.getProduct().getId() : null)
+                        .productName(i.getProduct() != null ? i.getProduct().getName() : "—")
+                        .quantity(i.getQuantity())
+                        .price(i.getPrice())
+                        .unit(i.getUnit())
+                        .build())
+                .collect(Collectors.toList());
+
+        return SaleResponse.builder()
+                .id(sale.getId())
+                .saleDate(sale.getSaleDate())
+                .totalAmount(sale.getTotalAmount())
+                .retailerEmail(sale.getRetailer() != null ? sale.getRetailer().getEmail() : null)
+                .items(items)
+                .build();
     }
 }

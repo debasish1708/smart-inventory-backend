@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 @Data @Builder @NoArgsConstructor @AllArgsConstructor
 public class InventoryResponse {
     private Long      id;
+    private Long      productId;
     private String    productName;
     private String    category;
     private String    brand;
