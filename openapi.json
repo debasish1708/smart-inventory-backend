@@ -1,0 +1,1901 @@
+﻿{
+    "openapi":  "3.0.1",
+    "info":  {
+                 "title":  "OpenAPI definition",
+                 "version":  "v0"
+             },
+    "servers":  [
+                    {
+                        "url":  "http://localhost:8080",
+                        "description":  "Generated server url"
+                    }
+                ],
+    "security":  [
+                     {
+                         "bearerAuth":  [
+
+                                        ]
+                     }
+                 ],
+    "tags":  [
+                 {
+                     "name":  "Migration",
+                     "description":  "Database seeding and migration endpoints"
+                 }
+             ],
+    "paths":  {
+                  "/api/supplier/orders/{id}/status":  {
+                                                           "put":  {
+                                                                       "tags":  [
+                                                                                    "supplier-controller"
+                                                                                ],
+                                                                       "operationId":  "updateOrderStatus",
+                                                                       "parameters":  [
+                                                                                          {
+                                                                                              "name":  "id",
+                                                                                              "in":  "path",
+                                                                                              "required":  true,
+                                                                                              "schema":  "@{type=integer; format=int64}"
+                                                                                          },
+                                                                                          {
+                                                                                              "name":  "status",
+                                                                                              "in":  "query",
+                                                                                              "required":  true,
+                                                                                              "schema":  "@{type=string}"
+                                                                                          }
+                                                                                      ],
+                                                                       "responses":  {
+                                                                                         "200":  {
+                                                                                                     "description":  "OK",
+                                                                                                     "content":  "@{*/*=}"
+                                                                                                 }
+                                                                                     }
+                                                                   }
+                                                       },
+                  "/api/supplier/inventory/{id}":  {
+                                                       "put":  {
+                                                                   "tags":  [
+                                                                                "supplier-controller"
+                                                                            ],
+                                                                   "operationId":  "updateInventory",
+                                                                   "parameters":  [
+                                                                                      {
+                                                                                          "name":  "id",
+                                                                                          "in":  "path",
+                                                                                          "required":  true,
+                                                                                          "schema":  "@{type=integer; format=int64}"
+                                                                                      }
+                                                                                  ],
+                                                                   "requestBody":  {
+                                                                                       "content":  {
+                                                                                                       "application/json":  "@{schema=}"
+                                                                                                   },
+                                                                                       "required":  true
+                                                                                   },
+                                                                   "responses":  {
+                                                                                     "200":  {
+                                                                                                 "description":  "OK",
+                                                                                                 "content":  "@{*/*=}"
+                                                                                             }
+                                                                                 }
+                                                               },
+                                                       "delete":  {
+                                                                      "tags":  [
+                                                                                   "supplier-controller"
+                                                                               ],
+                                                                      "operationId":  "deleteInventory",
+                                                                      "parameters":  [
+                                                                                         {
+                                                                                             "name":  "id",
+                                                                                             "in":  "path",
+                                                                                             "required":  true,
+                                                                                             "schema":  "@{type=integer; format=int64}"
+                                                                                         }
+                                                                                     ],
+                                                                      "responses":  {
+                                                                                        "200":  {
+                                                                                                    "description":  "OK",
+                                                                                                    "content":  "@{*/*=}"
+                                                                                                }
+                                                                                    }
+                                                                  }
+                                                   },
+                  "/api/retailer/inventory/{id}":  {
+                                                       "put":  {
+                                                                   "tags":  [
+                                                                                "retailer-controller"
+                                                                            ],
+                                                                   "operationId":  "updateInventory_1",
+                                                                   "parameters":  [
+                                                                                      {
+                                                                                          "name":  "id",
+                                                                                          "in":  "path",
+                                                                                          "required":  true,
+                                                                                          "schema":  "@{type=integer; format=int64}"
+                                                                                      }
+                                                                                  ],
+                                                                   "requestBody":  {
+                                                                                       "content":  {
+                                                                                                       "application/json":  "@{schema=}"
+                                                                                                   },
+                                                                                       "required":  true
+                                                                                   },
+                                                                   "responses":  {
+                                                                                     "200":  {
+                                                                                                 "description":  "OK",
+                                                                                                 "content":  "@{*/*=}"
+                                                                                             }
+                                                                                 }
+                                                               },
+                                                       "delete":  {
+                                                                      "tags":  [
+                                                                                   "retailer-controller"
+                                                                               ],
+                                                                      "operationId":  "deleteInventory_1",
+                                                                      "parameters":  [
+                                                                                         {
+                                                                                             "name":  "id",
+                                                                                             "in":  "path",
+                                                                                             "required":  true,
+                                                                                             "schema":  "@{type=integer; format=int64}"
+                                                                                         }
+                                                                                     ],
+                                                                      "responses":  {
+                                                                                        "200":  {
+                                                                                                    "description":  "OK",
+                                                                                                    "content":  "@{*/*=}"
+                                                                                                }
+                                                                                    }
+                                                                  }
+                                                   },
+                  "/api/profile/update":  {
+                                              "put":  {
+                                                          "tags":  [
+                                                                       "profile-controller"
+                                                                   ],
+                                                          "operationId":  "updateProfile",
+                                                          "requestBody":  {
+                                                                              "content":  {
+                                                                                              "application/json":  "@{schema=}"
+                                                                                          },
+                                                                              "required":  true
+                                                                          },
+                                                          "responses":  {
+                                                                            "200":  {
+                                                                                        "description":  "OK",
+                                                                                        "content":  "@{*/*=}"
+                                                                                    }
+                                                                        }
+                                                      }
+                                          },
+                  "/api/admin/unblock/{userId}":  {
+                                                      "put":  {
+                                                                  "tags":  [
+                                                                               "admin-controller"
+                                                                           ],
+                                                                  "operationId":  "unblockUser",
+                                                                  "parameters":  [
+                                                                                     {
+                                                                                         "name":  "userId",
+                                                                                         "in":  "path",
+                                                                                         "required":  true,
+                                                                                         "schema":  "@{type=integer; format=int64}"
+                                                                                     }
+                                                                                 ],
+                                                                  "responses":  {
+                                                                                    "200":  {
+                                                                                                "description":  "OK",
+                                                                                                "content":  "@{*/*=}"
+                                                                                            }
+                                                                                }
+                                                              }
+                                                  },
+                  "/api/admin/block/{userId}":  {
+                                                    "put":  {
+                                                                "tags":  [
+                                                                             "admin-controller"
+                                                                         ],
+                                                                "operationId":  "blockUser",
+                                                                "parameters":  [
+                                                                                   {
+                                                                                       "name":  "userId",
+                                                                                       "in":  "path",
+                                                                                       "required":  true,
+                                                                                       "schema":  "@{type=integer; format=int64}"
+                                                                                   }
+                                                                               ],
+                                                                "responses":  {
+                                                                                  "200":  {
+                                                                                              "description":  "OK",
+                                                                                              "content":  "@{*/*=}"
+                                                                                          }
+                                                                              }
+                                                            }
+                                                },
+                  "/api/admin/approve/{userId}":  {
+                                                      "put":  {
+                                                                  "tags":  [
+                                                                               "admin-controller"
+                                                                           ],
+                                                                  "operationId":  "approveUser",
+                                                                  "parameters":  [
+                                                                                     {
+                                                                                         "name":  "userId",
+                                                                                         "in":  "path",
+                                                                                         "required":  true,
+                                                                                         "schema":  "@{type=integer; format=int64}"
+                                                                                     }
+                                                                                 ],
+                                                                  "responses":  {
+                                                                                    "200":  {
+                                                                                                "description":  "OK",
+                                                                                                "content":  "@{*/*=}"
+                                                                                            }
+                                                                                }
+                                                              }
+                                                  },
+                  "/api/supplier/inventory":  {
+                                                  "get":  {
+                                                              "tags":  [
+                                                                           "supplier-controller"
+                                                                       ],
+                                                              "operationId":  "getInventory",
+                                                              "responses":  {
+                                                                                "200":  {
+                                                                                            "description":  "OK",
+                                                                                            "content":  "@{*/*=}"
+                                                                                        }
+                                                                            }
+                                                          },
+                                                  "post":  {
+                                                               "tags":  [
+                                                                            "supplier-controller"
+                                                                        ],
+                                                               "operationId":  "addInventory",
+                                                               "requestBody":  {
+                                                                                   "content":  {
+                                                                                                   "application/json":  "@{schema=}"
+                                                                                               },
+                                                                                   "required":  true
+                                                                               },
+                                                               "responses":  {
+                                                                                 "200":  {
+                                                                                             "description":  "OK",
+                                                                                             "content":  "@{*/*=}"
+                                                                                         }
+                                                                             }
+                                                           }
+                                              },
+                  "/api/retailer/inventory":  {
+                                                  "get":  {
+                                                              "tags":  [
+                                                                           "retailer-controller"
+                                                                       ],
+                                                              "operationId":  "getInventory_1",
+                                                              "responses":  {
+                                                                                "200":  {
+                                                                                            "description":  "OK",
+                                                                                            "content":  "@{*/*=}"
+                                                                                        }
+                                                                            }
+                                                          },
+                                                  "post":  {
+                                                               "tags":  [
+                                                                            "retailer-controller"
+                                                                        ],
+                                                               "operationId":  "addInventory_1",
+                                                               "requestBody":  {
+                                                                                   "content":  {
+                                                                                                   "application/json":  "@{schema=}"
+                                                                                               },
+                                                                                   "required":  true
+                                                                               },
+                                                               "responses":  {
+                                                                                 "200":  {
+                                                                                             "description":  "OK",
+                                                                                             "content":  "@{*/*=}"
+                                                                                         }
+                                                                             }
+                                                           }
+                                              },
+                  "/api/profile/complete":  {
+                                                "post":  {
+                                                             "tags":  [
+                                                                          "profile-controller"
+                                                                      ],
+                                                             "operationId":  "completeProfile",
+                                                             "requestBody":  {
+                                                                                 "content":  {
+                                                                                                 "application/json":  "@{schema=}"
+                                                                                             },
+                                                                                 "required":  true
+                                                                             },
+                                                             "responses":  {
+                                                                               "200":  {
+                                                                                           "description":  "OK",
+                                                                                           "content":  "@{*/*=}"
+                                                                                       }
+                                                                           }
+                                                         }
+                                            },
+                  "/api/migration/seed":  {
+                                              "post":  {
+                                                           "tags":  [
+                                                                        "Migration"
+                                                                    ],
+                                                           "summary":  "Seed database with sample categories, products, users, and inventory",
+                                                           "operationId":  "seedDatabase",
+                                                           "parameters":  [
+                                                                              {
+                                                                                  "name":  "force",
+                                                                                  "in":  "query",
+                                                                                  "required":  false,
+                                                                                  "schema":  "@{type=boolean; default=False}"
+                                                                              }
+                                                                          ],
+                                                           "responses":  {
+                                                                             "200":  {
+                                                                                         "description":  "OK",
+                                                                                         "content":  "@{*/*=}"
+                                                                                     }
+                                                                         }
+                                                       }
+                                          },
+                  "/api/auth/verify-otp":  {
+                                               "post":  {
+                                                            "tags":  [
+                                                                         "auth-controller"
+                                                                     ],
+                                                            "operationId":  "verifyOtp",
+                                                            "requestBody":  {
+                                                                                "content":  {
+                                                                                                "application/json":  "@{schema=}"
+                                                                                            },
+                                                                                "required":  true
+                                                                            },
+                                                            "responses":  {
+                                                                              "200":  {
+                                                                                          "description":  "OK",
+                                                                                          "content":  "@{*/*=}"
+                                                                                      }
+                                                                          }
+                                                        }
+                                           },
+                  "/api/auth/resend-otp":  {
+                                               "post":  {
+                                                            "tags":  [
+                                                                         "auth-controller"
+                                                                     ],
+                                                            "operationId":  "resendOtp",
+                                                            "parameters":  [
+                                                                               {
+                                                                                   "name":  "email",
+                                                                                   "in":  "query",
+                                                                                   "required":  true,
+                                                                                   "schema":  "@{type=string}"
+                                                                               }
+                                                                           ],
+                                                            "responses":  {
+                                                                              "200":  {
+                                                                                          "description":  "OK",
+                                                                                          "content":  "@{*/*=}"
+                                                                                      }
+                                                                          }
+                                                        }
+                                           },
+                  "/api/auth/register":  {
+                                             "post":  {
+                                                          "tags":  [
+                                                                       "auth-controller"
+                                                                   ],
+                                                          "operationId":  "register",
+                                                          "requestBody":  {
+                                                                              "content":  {
+                                                                                              "application/json":  "@{schema=}"
+                                                                                          },
+                                                                              "required":  true
+                                                                          },
+                                                          "responses":  {
+                                                                            "200":  {
+                                                                                        "description":  "OK",
+                                                                                        "content":  "@{*/*=}"
+                                                                                    }
+                                                                        }
+                                                      }
+                                         },
+                  "/api/auth/login":  {
+                                          "post":  {
+                                                       "tags":  [
+                                                                    "auth-controller"
+                                                                ],
+                                                       "operationId":  "login",
+                                                       "requestBody":  {
+                                                                           "content":  {
+                                                                                           "application/json":  "@{schema=}"
+                                                                                       },
+                                                                           "required":  true
+                                                                       },
+                                                       "responses":  {
+                                                                         "200":  {
+                                                                                     "description":  "OK",
+                                                                                     "content":  "@{*/*=}"
+                                                                                 }
+                                                                     }
+                                                   }
+                                      },
+                  "/api/supplier/subscription":  {
+                                                     "get":  {
+                                                                 "tags":  [
+                                                                              "supplier-controller"
+                                                                          ],
+                                                                 "operationId":  "getSubscription",
+                                                                 "responses":  {
+                                                                                   "200":  {
+                                                                                               "description":  "OK",
+                                                                                               "content":  "@{*/*=}"
+                                                                                           }
+                                                                               }
+                                                             }
+                                                 },
+                  "/api/supplier/report":  {
+                                               "get":  {
+                                                           "tags":  [
+                                                                        "supplier-controller"
+                                                                    ],
+                                                           "operationId":  "getReport",
+                                                           "responses":  {
+                                                                             "200":  {
+                                                                                         "description":  "OK",
+                                                                                         "content":  "@{*/*=}"
+                                                                                     }
+                                                                         }
+                                                       }
+                                           },
+                  "/api/supplier/ratings":  {
+                                                "get":  {
+                                                            "tags":  [
+                                                                         "supplier-controller"
+                                                                     ],
+                                                            "operationId":  "getRatings",
+                                                            "responses":  {
+                                                                              "200":  {
+                                                                                          "description":  "OK",
+                                                                                          "content":  "@{*/*=}"
+                                                                                      }
+                                                                          }
+                                                        }
+                                            },
+                  "/api/supplier/orders":  {
+                                               "get":  {
+                                                           "tags":  [
+                                                                        "supplier-controller"
+                                                                    ],
+                                                           "operationId":  "getOrders",
+                                                           "responses":  {
+                                                                             "200":  {
+                                                                                         "description":  "OK",
+                                                                                         "content":  "@{*/*=}"
+                                                                                     }
+                                                                         }
+                                                       }
+                                           },
+                  "/api/supplier/analytics":  {
+                                                  "get":  {
+                                                              "tags":  [
+                                                                           "supplier-controller"
+                                                                       ],
+                                                              "operationId":  "getAnalytics",
+                                                              "responses":  {
+                                                                                "200":  {
+                                                                                            "description":  "OK",
+                                                                                            "content":  "@{*/*=}"
+                                                                                        }
+                                                                            }
+                                                          }
+                                              },
+                  "/api/retailer/supplier-match":  {
+                                                       "get":  {
+                                                                   "tags":  [
+                                                                                "retailer-controller"
+                                                                            ],
+                                                                   "operationId":  "searchByProduct",
+                                                                   "parameters":  [
+                                                                                      {
+                                                                                          "name":  "productId",
+                                                                                          "in":  "query",
+                                                                                          "required":  true,
+                                                                                          "schema":  "@{type=integer; format=int64}"
+                                                                                      }
+                                                                                  ],
+                                                                   "responses":  {
+                                                                                     "200":  {
+                                                                                                 "description":  "OK",
+                                                                                                 "content":  "@{*/*=}"
+                                                                                             }
+                                                                                 }
+                                                               }
+                                                   },
+                  "/api/retailer/supplier-match/all":  {
+                                                           "get":  {
+                                                                       "tags":  [
+                                                                                    "retailer-controller"
+                                                                                ],
+                                                                       "operationId":  "getAllMatches",
+                                                                       "responses":  {
+                                                                                         "200":  {
+                                                                                                     "description":  "OK",
+                                                                                                     "content":  "@{*/*=}"
+                                                                                                 }
+                                                                                     }
+                                                                   }
+                                                       },
+                  "/api/retailer/subscription":  {
+                                                     "get":  {
+                                                                 "tags":  [
+                                                                              "retailer-controller"
+                                                                          ],
+                                                                 "operationId":  "getSubscription_1",
+                                                                 "responses":  {
+                                                                                   "200":  {
+                                                                                               "description":  "OK",
+                                                                                               "content":  "@{*/*=}"
+                                                                                           }
+                                                                               }
+                                                             }
+                                                 },
+                  "/api/retailer/ratings":  {
+                                                "get":  {
+                                                            "tags":  [
+                                                                         "retailer-controller"
+                                                                     ],
+                                                            "operationId":  "getRatings_1",
+                                                            "responses":  {
+                                                                              "200":  {
+                                                                                          "description":  "OK",
+                                                                                          "content":  "@{*/*=}"
+                                                                                      }
+                                                                          }
+                                                        }
+                                            },
+                  "/api/retailer/orders":  {
+                                               "get":  {
+                                                           "tags":  [
+                                                                        "retailer-controller"
+                                                                    ],
+                                                           "operationId":  "getOrders_1",
+                                                           "responses":  {
+                                                                             "200":  {
+                                                                                         "description":  "OK",
+                                                                                         "content":  "@{*/*=}"
+                                                                                     }
+                                                                         }
+                                                       }
+                                           },
+                  "/api/retailer/notifications":  {
+                                                      "get":  {
+                                                                  "tags":  [
+                                                                               "retailer-controller"
+                                                                           ],
+                                                                  "operationId":  "getNotifications",
+                                                                  "responses":  {
+                                                                                    "200":  {
+                                                                                                "description":  "OK",
+                                                                                                "content":  "@{*/*=}"
+                                                                                            }
+                                                                                }
+                                                              }
+                                                  },
+                  "/api/retailer/analytics":  {
+                                                  "get":  {
+                                                              "tags":  [
+                                                                           "retailer-controller"
+                                                                       ],
+                                                              "operationId":  "getAnalytics_1",
+                                                              "responses":  {
+                                                                                "200":  {
+                                                                                            "description":  "OK",
+                                                                                            "content":  "@{*/*=}"
+                                                                                        }
+                                                                            }
+                                                          }
+                                              },
+                  "/api/profile/me":  {
+                                          "get":  {
+                                                      "tags":  [
+                                                                   "profile-controller"
+                                                               ],
+                                                      "operationId":  "getMyProfile",
+                                                      "responses":  {
+                                                                        "200":  {
+                                                                                    "description":  "OK",
+                                                                                    "content":  "@{*/*=}"
+                                                                                }
+                                                                    }
+                                                  }
+                                      },
+                  "/api/catalog/products":  {
+                                                "get":  {
+                                                            "tags":  [
+                                                                         "catalog-controller"
+                                                                     ],
+                                                            "operationId":  "getProducts",
+                                                            "parameters":  [
+                                                                               {
+                                                                                   "name":  "categoryId",
+                                                                                   "in":  "query",
+                                                                                   "required":  false,
+                                                                                   "schema":  "@{type=integer; format=int64}"
+                                                                               }
+                                                                           ],
+                                                            "responses":  {
+                                                                              "200":  {
+                                                                                          "description":  "OK",
+                                                                                          "content":  "@{*/*=}"
+                                                                                      }
+                                                                          }
+                                                        }
+                                            },
+                  "/api/catalog/categories":  {
+                                                  "get":  {
+                                                              "tags":  [
+                                                                           "catalog-controller"
+                                                                       ],
+                                                              "operationId":  "getAllCategories",
+                                                              "responses":  {
+                                                                                "200":  {
+                                                                                            "description":  "OK",
+                                                                                            "content":  "@{*/*=}"
+                                                                                        }
+                                                                            }
+                                                          }
+                                              },
+                  "/api/auth/otp-debug":  {
+                                              "get":  {
+                                                          "tags":  [
+                                                                       "auth-controller"
+                                                                   ],
+                                                          "operationId":  "debugOtp",
+                                                          "parameters":  [
+                                                                             {
+                                                                                 "name":  "email",
+                                                                                 "in":  "query",
+                                                                                 "required":  true,
+                                                                                 "schema":  "@{type=string}"
+                                                                             }
+                                                                         ],
+                                                          "responses":  {
+                                                                            "200":  {
+                                                                                        "description":  "OK",
+                                                                                        "content":  "@{*/*=}"
+                                                                                    }
+                                                                        }
+                                                      }
+                                          },
+                  "/api/admin/users":  {
+                                           "get":  {
+                                                       "tags":  [
+                                                                    "admin-controller"
+                                                                ],
+                                                       "operationId":  "getAllUsers",
+                                                       "responses":  {
+                                                                         "200":  {
+                                                                                     "description":  "OK",
+                                                                                     "content":  "@{*/*=}"
+                                                                                 }
+                                                                     }
+                                                   }
+                                       },
+                  "/api/admin/user-profile/{userId}":  {
+                                                           "get":  {
+                                                                       "tags":  [
+                                                                                    "admin-controller"
+                                                                                ],
+                                                                       "operationId":  "getUserProfile",
+                                                                       "parameters":  [
+                                                                                          {
+                                                                                              "name":  "userId",
+                                                                                              "in":  "path",
+                                                                                              "required":  true,
+                                                                                              "schema":  "@{type=integer; format=int64}"
+                                                                                          }
+                                                                                      ],
+                                                                       "responses":  {
+                                                                                         "200":  {
+                                                                                                     "description":  "OK",
+                                                                                                     "content":  "@{*/*=}"
+                                                                                                 }
+                                                                                     }
+                                                                   }
+                                                       },
+                  "/api/admin/stats":  {
+                                           "get":  {
+                                                       "tags":  [
+                                                                    "admin-controller"
+                                                                ],
+                                                       "operationId":  "getStats",
+                                                       "responses":  {
+                                                                         "200":  {
+                                                                                     "description":  "OK",
+                                                                                     "content":  "@{*/*=}"
+                                                                                 }
+                                                                     }
+                                                   }
+                                       },
+                  "/api/admin/pending-users":  {
+                                                   "get":  {
+                                                               "tags":  [
+                                                                            "admin-controller"
+                                                                        ],
+                                                               "operationId":  "getPendingUsers",
+                                                               "responses":  {
+                                                                                 "200":  {
+                                                                                             "description":  "OK",
+                                                                                             "content":  "@{*/*=}"
+                                                                                         }
+                                                                             }
+                                                           }
+                                               },
+                  "/api/admin/all-users-raw":  {
+                                                   "get":  {
+                                                               "tags":  [
+                                                                            "admin-controller"
+                                                                        ],
+                                                               "operationId":  "getAllUsersRaw",
+                                                               "responses":  {
+                                                                                 "200":  {
+                                                                                             "description":  "OK",
+                                                                                             "content":  "@{*/*=}"
+                                                                                         }
+                                                                             }
+                                                           }
+                                               },
+                  "/api/admin/delete/{userId}":  {
+                                                     "delete":  {
+                                                                    "tags":  [
+                                                                                 "admin-controller"
+                                                                             ],
+                                                                    "operationId":  "deleteUser",
+                                                                    "parameters":  [
+                                                                                       {
+                                                                                           "name":  "userId",
+                                                                                           "in":  "path",
+                                                                                           "required":  true,
+                                                                                           "schema":  "@{type=integer; format=int64}"
+                                                                                       }
+                                                                                   ],
+                                                                    "responses":  {
+                                                                                      "200":  {
+                                                                                                  "description":  "OK",
+                                                                                                  "content":  "@{*/*=}"
+                                                                                              }
+                                                                                  }
+                                                                }
+                                                 }
+              },
+    "components":  {
+                       "schemas":  {
+                                       "ApiResponseString":  {
+                                                                 "type":  "object",
+                                                                 "properties":  {
+                                                                                    "success":  {
+                                                                                                    "type":  "boolean"
+                                                                                                },
+                                                                                    "message":  {
+                                                                                                    "type":  "string"
+                                                                                                },
+                                                                                    "data":  {
+                                                                                                 "type":  "string"
+                                                                                             }
+                                                                                }
+                                                             },
+                                       "InventoryRequest":  {
+                                                                "type":  "object",
+                                                                "properties":  {
+                                                                                   "productName":  {
+                                                                                                       "type":  "string"
+                                                                                                   },
+                                                                                   "category":  {
+                                                                                                    "type":  "string"
+                                                                                                },
+                                                                                   "brand":  {
+                                                                                                 "type":  "string"
+                                                                                             },
+                                                                                   "unit":  {
+                                                                                                "type":  "string"
+                                                                                            },
+                                                                                   "sku":  {
+                                                                                               "type":  "string"
+                                                                                           },
+                                                                                   "price":  {
+                                                                                                 "type":  "number"
+                                                                                             },
+                                                                                   "quantity":  {
+                                                                                                    "type":  "integer",
+                                                                                                    "format":  "int32"
+                                                                                                },
+                                                                                   "thresholdValue":  {
+                                                                                                          "type":  "integer",
+                                                                                                          "format":  "int32"
+                                                                                                      },
+                                                                                   "moq":  {
+                                                                                               "type":  "integer",
+                                                                                               "format":  "int32"
+                                                                                           },
+                                                                                   "stockQuantity":  {
+                                                                                                         "type":  "integer",
+                                                                                                         "format":  "int32"
+                                                                                                     },
+                                                                                   "leadTime":  {
+                                                                                                    "type":  "integer",
+                                                                                                    "format":  "int32"
+                                                                                                },
+                                                                                   "isActive":  {
+                                                                                                    "type":  "boolean"
+                                                                                                }
+                                                                               }
+                                                            },
+                                       "ApiResponseInventoryResponse":  {
+                                                                            "type":  "object",
+                                                                            "properties":  {
+                                                                                               "success":  {
+                                                                                                               "type":  "boolean"
+                                                                                                           },
+                                                                                               "message":  {
+                                                                                                               "type":  "string"
+                                                                                                           },
+                                                                                               "data":  {
+                                                                                                            "$ref":  "#/components/schemas/InventoryResponse"
+                                                                                                        }
+                                                                                           }
+                                                                        },
+                                       "InventoryResponse":  {
+                                                                 "type":  "object",
+                                                                 "properties":  {
+                                                                                    "id":  {
+                                                                                               "type":  "integer",
+                                                                                               "format":  "int64"
+                                                                                           },
+                                                                                    "productName":  {
+                                                                                                        "type":  "string"
+                                                                                                    },
+                                                                                    "category":  {
+                                                                                                     "type":  "string"
+                                                                                                 },
+                                                                                    "brand":  {
+                                                                                                  "type":  "string"
+                                                                                              },
+                                                                                    "unit":  {
+                                                                                                 "type":  "string"
+                                                                                             },
+                                                                                    "sku":  {
+                                                                                                "type":  "string"
+                                                                                            },
+                                                                                    "price":  {
+                                                                                                  "type":  "number"
+                                                                                              },
+                                                                                    "quantity":  {
+                                                                                                     "type":  "integer",
+                                                                                                     "format":  "int32"
+                                                                                                 },
+                                                                                    "thresholdValue":  {
+                                                                                                           "type":  "integer",
+                                                                                                           "format":  "int32"
+                                                                                                       },
+                                                                                    "moq":  {
+                                                                                                "type":  "integer",
+                                                                                                "format":  "int32"
+                                                                                            },
+                                                                                    "stockQuantity":  {
+                                                                                                          "type":  "integer",
+                                                                                                          "format":  "int32"
+                                                                                                      },
+                                                                                    "leadTime":  {
+                                                                                                     "type":  "integer",
+                                                                                                     "format":  "int32"
+                                                                                                 },
+                                                                                    "isActive":  {
+                                                                                                     "type":  "boolean"
+                                                                                                 }
+                                                                                }
+                                                             },
+                                       "UpdateProfileRequest":  {
+                                                                    "required":  [
+                                                                                     "address",
+                                                                                     "businessName",
+                                                                                     "city",
+                                                                                     "firstName",
+                                                                                     "lastName",
+                                                                                     "mobNo",
+                                                                                     "pincode",
+                                                                                     "state"
+                                                                                 ],
+                                                                    "type":  "object",
+                                                                    "properties":  {
+                                                                                       "firstName":  {
+                                                                                                         "type":  "string"
+                                                                                                     },
+                                                                                       "lastName":  {
+                                                                                                        "type":  "string"
+                                                                                                    },
+                                                                                       "businessName":  {
+                                                                                                            "type":  "string"
+                                                                                                        },
+                                                                                       "businessType":  {
+                                                                                                            "type":  "string"
+                                                                                                        },
+                                                                                       "mobNo":  {
+                                                                                                     "type":  "string"
+                                                                                                 },
+                                                                                       "address":  {
+                                                                                                       "type":  "string"
+                                                                                                   },
+                                                                                       "gst":  {
+                                                                                                   "type":  "string"
+                                                                                               },
+                                                                                       "city":  {
+                                                                                                    "type":  "string"
+                                                                                                },
+                                                                                       "state":  {
+                                                                                                     "type":  "string"
+                                                                                                 },
+                                                                                       "pincode":  {
+                                                                                                       "type":  "string"
+                                                                                                   },
+                                                                                       "profileImageUrl":  {
+                                                                                                               "type":  "string"
+                                                                                                           }
+                                                                                   }
+                                                                },
+                                       "ApiResponseProfileResponse":  {
+                                                                          "type":  "object",
+                                                                          "properties":  {
+                                                                                             "success":  {
+                                                                                                             "type":  "boolean"
+                                                                                                         },
+                                                                                             "message":  {
+                                                                                                             "type":  "string"
+                                                                                                         },
+                                                                                             "data":  {
+                                                                                                          "$ref":  "#/components/schemas/ProfileResponse"
+                                                                                                      }
+                                                                                         }
+                                                                      },
+                                       "ProfileResponse":  {
+                                                               "type":  "object",
+                                                               "properties":  {
+                                                                                  "userId":  {
+                                                                                                 "type":  "integer",
+                                                                                                 "format":  "int64"
+                                                                                             },
+                                                                                  "email":  {
+                                                                                                "type":  "string"
+                                                                                            },
+                                                                                  "role":  {
+                                                                                               "type":  "string"
+                                                                                           },
+                                                                                  "userStatus":  {
+                                                                                                     "type":  "string"
+                                                                                                 },
+                                                                                  "profileCompleted":  {
+                                                                                                           "type":  "boolean"
+                                                                                                       },
+                                                                                  "firstName":  {
+                                                                                                    "type":  "string"
+                                                                                                },
+                                                                                  "lastName":  {
+                                                                                                   "type":  "string"
+                                                                                               },
+                                                                                  "businessName":  {
+                                                                                                       "type":  "string"
+                                                                                                   },
+                                                                                  "businessType":  {
+                                                                                                       "type":  "string"
+                                                                                                   },
+                                                                                  "mobNo":  {
+                                                                                                "type":  "string"
+                                                                                            },
+                                                                                  "address":  {
+                                                                                                  "type":  "string"
+                                                                                              },
+                                                                                  "gst":  {
+                                                                                              "type":  "string"
+                                                                                          },
+                                                                                  "city":  {
+                                                                                               "type":  "string"
+                                                                                           },
+                                                                                  "state":  {
+                                                                                                "type":  "string"
+                                                                                            },
+                                                                                  "pincode":  {
+                                                                                                  "type":  "string"
+                                                                                              },
+                                                                                  "profileImageUrl":  {
+                                                                                                          "type":  "string"
+                                                                                                      }
+                                                                              }
+                                                           },
+                                       "ApiResponseMigrationResponse":  {
+                                                                            "type":  "object",
+                                                                            "properties":  {
+                                                                                               "success":  {
+                                                                                                               "type":  "boolean"
+                                                                                                           },
+                                                                                               "message":  {
+                                                                                                               "type":  "string"
+                                                                                                           },
+                                                                                               "data":  {
+                                                                                                            "$ref":  "#/components/schemas/MigrationResponse"
+                                                                                                        }
+                                                                                           }
+                                                                        },
+                                       "MigrationResponse":  {
+                                                                 "type":  "object",
+                                                                 "properties":  {
+                                                                                    "categoriesCreated":  {
+                                                                                                              "type":  "integer",
+                                                                                                              "format":  "int32"
+                                                                                                          },
+                                                                                    "productsCreated":  {
+                                                                                                            "type":  "integer",
+                                                                                                            "format":  "int32"
+                                                                                                        },
+                                                                                    "retailersCreated":  {
+                                                                                                             "type":  "integer",
+                                                                                                             "format":  "int32"
+                                                                                                         },
+                                                                                    "suppliersCreated":  {
+                                                                                                             "type":  "integer",
+                                                                                                             "format":  "int32"
+                                                                                                         },
+                                                                                    "adminsCreated":  {
+                                                                                                          "type":  "integer",
+                                                                                                          "format":  "int32"
+                                                                                                      },
+                                                                                    "retailerInventoryRecords":  {
+                                                                                                                     "type":  "integer",
+                                                                                                                     "format":  "int32"
+                                                                                                                 },
+                                                                                    "supplierInventoryRecords":  {
+                                                                                                                     "type":  "integer",
+                                                                                                                     "format":  "int32"
+                                                                                                                 },
+                                                                                    "defaultPassword":  {
+                                                                                                            "type":  "string"
+                                                                                                        },
+                                                                                    "adminEmail":  {
+                                                                                                       "type":  "string"
+                                                                                                   }
+                                                                                }
+                                                             },
+                                       "VerifyOtpRequest":  {
+                                                                "required":  [
+                                                                                 "email",
+                                                                                 "otp"
+                                                                             ],
+                                                                "type":  "object",
+                                                                "properties":  {
+                                                                                   "email":  {
+                                                                                                 "type":  "string"
+                                                                                             },
+                                                                                   "otp":  {
+                                                                                               "type":  "string"
+                                                                                           }
+                                                                               }
+                                                            },
+                                       "RegisterRequest":  {
+                                                               "required":  [
+                                                                                "email",
+                                                                                "password",
+                                                                                "role"
+                                                                            ],
+                                                               "type":  "object",
+                                                               "properties":  {
+                                                                                  "email":  {
+                                                                                                "type":  "string"
+                                                                                            },
+                                                                                  "password":  {
+                                                                                                   "maxLength":  2147483647,
+                                                                                                   "minLength":  6,
+                                                                                                   "type":  "string"
+                                                                                               },
+                                                                                  "role":  {
+                                                                                               "pattern":  "RETAILER|SUPPLIER",
+                                                                                               "type":  "string"
+                                                                                           }
+                                                                              }
+                                                           },
+                                       "LoginRequest":  {
+                                                            "required":  [
+                                                                             "email",
+                                                                             "password"
+                                                                         ],
+                                                            "type":  "object",
+                                                            "properties":  {
+                                                                               "email":  {
+                                                                                             "type":  "string"
+                                                                                         },
+                                                                               "password":  {
+                                                                                                "type":  "string"
+                                                                                            }
+                                                                           }
+                                                        },
+                                       "ApiResponseAuthResponse":  {
+                                                                       "type":  "object",
+                                                                       "properties":  {
+                                                                                          "success":  {
+                                                                                                          "type":  "boolean"
+                                                                                                      },
+                                                                                          "message":  {
+                                                                                                          "type":  "string"
+                                                                                                      },
+                                                                                          "data":  {
+                                                                                                       "$ref":  "#/components/schemas/AuthResponse"
+                                                                                                   }
+                                                                                      }
+                                                                   },
+                                       "AuthResponse":  {
+                                                            "type":  "object",
+                                                            "properties":  {
+                                                                               "token":  {
+                                                                                             "type":  "string"
+                                                                                         },
+                                                                               "email":  {
+                                                                                             "type":  "string"
+                                                                                         },
+                                                                               "role":  {
+                                                                                            "type":  "string"
+                                                                                        },
+                                                                               "status":  {
+                                                                                              "type":  "string"
+                                                                                          },
+                                                                               "userId":  {
+                                                                                              "type":  "integer",
+                                                                                              "format":  "int64"
+                                                                                          },
+                                                                               "profileCompleted":  {
+                                                                                                        "type":  "boolean"
+                                                                                                    }
+                                                                           }
+                                                        },
+                                       "ApiResponseSubscriptionResponse":  {
+                                                                               "type":  "object",
+                                                                               "properties":  {
+                                                                                                  "success":  {
+                                                                                                                  "type":  "boolean"
+                                                                                                              },
+                                                                                                  "message":  {
+                                                                                                                  "type":  "string"
+                                                                                                              },
+                                                                                                  "data":  {
+                                                                                                               "$ref":  "#/components/schemas/SubscriptionResponse"
+                                                                                                           }
+                                                                                              }
+                                                                           },
+                                       "SubscriptionResponse":  {
+                                                                    "type":  "object",
+                                                                    "properties":  {
+                                                                                       "id":  {
+                                                                                                  "type":  "integer",
+                                                                                                  "format":  "int64"
+                                                                                              },
+                                                                                       "planName":  {
+                                                                                                        "type":  "string"
+                                                                                                    },
+                                                                                       "status":  {
+                                                                                                      "type":  "string"
+                                                                                                  },
+                                                                                       "startDateTime":  {
+                                                                                                             "type":  "string",
+                                                                                                             "format":  "date-time"
+                                                                                                         },
+                                                                                       "endDateTime":  {
+                                                                                                           "type":  "string",
+                                                                                                           "format":  "date-time"
+                                                                                                       }
+                                                                                   }
+                                                                },
+                                       "ApiResponseListOrderResponse":  {
+                                                                            "type":  "object",
+                                                                            "properties":  {
+                                                                                               "success":  {
+                                                                                                               "type":  "boolean"
+                                                                                                           },
+                                                                                               "message":  {
+                                                                                                               "type":  "string"
+                                                                                                           },
+                                                                                               "data":  {
+                                                                                                            "type":  "array",
+                                                                                                            "items":  "@{$ref=#/components/schemas/OrderResponse}"
+                                                                                                        }
+                                                                                           }
+                                                                        },
+                                       "OrderItemResponse":  {
+                                                                 "type":  "object",
+                                                                 "properties":  {
+                                                                                    "id":  {
+                                                                                               "type":  "integer",
+                                                                                               "format":  "int64"
+                                                                                           },
+                                                                                    "productName":  {
+                                                                                                        "type":  "string"
+                                                                                                    },
+                                                                                    "quantity":  {
+                                                                                                     "type":  "integer",
+                                                                                                     "format":  "int32"
+                                                                                                 },
+                                                                                    "price":  {
+                                                                                                  "type":  "number"
+                                                                                              },
+                                                                                    "unit":  {
+                                                                                                 "type":  "string"
+                                                                                             }
+                                                                                }
+                                                             },
+                                       "OrderResponse":  {
+                                                             "type":  "object",
+                                                             "properties":  {
+                                                                                "id":  {
+                                                                                           "type":  "integer",
+                                                                                           "format":  "int64"
+                                                                                       },
+                                                                                "status":  {
+                                                                                               "type":  "string"
+                                                                                           },
+                                                                                "orderDate":  {
+                                                                                                  "type":  "string",
+                                                                                                  "format":  "date-time"
+                                                                                              },
+                                                                                "deliveredDate":  {
+                                                                                                      "type":  "string",
+                                                                                                      "format":  "date-time"
+                                                                                                  },
+                                                                                "supplierEmail":  {
+                                                                                                      "type":  "string"
+                                                                                                  },
+                                                                                "retailerEmail":  {
+                                                                                                      "type":  "string"
+                                                                                                  },
+                                                                                "items":  {
+                                                                                              "type":  "array",
+                                                                                              "items":  "@{$ref=#/components/schemas/OrderItemResponse}"
+                                                                                          },
+                                                                                "totalAmount":  {
+                                                                                                    "type":  "number"
+                                                                                                }
+                                                                            }
+                                                         },
+                                       "ApiResponseListRatingResponse":  {
+                                                                             "type":  "object",
+                                                                             "properties":  {
+                                                                                                "success":  {
+                                                                                                                "type":  "boolean"
+                                                                                                            },
+                                                                                                "message":  {
+                                                                                                                "type":  "string"
+                                                                                                            },
+                                                                                                "data":  {
+                                                                                                             "type":  "array",
+                                                                                                             "items":  "@{$ref=#/components/schemas/RatingResponse}"
+                                                                                                         }
+                                                                                            }
+                                                                         },
+                                       "RatingResponse":  {
+                                                              "type":  "object",
+                                                              "properties":  {
+                                                                                 "id":  {
+                                                                                            "type":  "integer",
+                                                                                            "format":  "int64"
+                                                                                        },
+                                                                                 "rating":  {
+                                                                                                "type":  "integer",
+                                                                                                "format":  "int32"
+                                                                                            },
+                                                                                 "review":  {
+                                                                                                "type":  "string"
+                                                                                            },
+                                                                                 "supplierEmail":  {
+                                                                                                       "type":  "string"
+                                                                                                   },
+                                                                                 "retailerEmail":  {
+                                                                                                       "type":  "string"
+                                                                                                   },
+                                                                                 "createdAt":  {
+                                                                                                   "type":  "string",
+                                                                                                   "format":  "date-time"
+                                                                                               }
+                                                                             }
+                                                          },
+                                       "ApiResponseListInventoryResponse":  {
+                                                                                "type":  "object",
+                                                                                "properties":  {
+                                                                                                   "success":  {
+                                                                                                                   "type":  "boolean"
+                                                                                                               },
+                                                                                                   "message":  {
+                                                                                                                   "type":  "string"
+                                                                                                               },
+                                                                                                   "data":  {
+                                                                                                                "type":  "array",
+                                                                                                                "items":  "@{$ref=#/components/schemas/InventoryResponse}"
+                                                                                                            }
+                                                                                               }
+                                                                            },
+                                       "AnalyticsResponse":  {
+                                                                 "type":  "object",
+                                                                 "properties":  {
+                                                                                    "totalOrders":  {
+                                                                                                        "type":  "integer",
+                                                                                                        "format":  "int64"
+                                                                                                    },
+                                                                                    "totalRevenue":  {
+                                                                                                         "type":  "number"
+                                                                                                     },
+                                                                                    "topProduct":  {
+                                                                                                       "type":  "string"
+                                                                                                   },
+                                                                                    "monthlyGrowth":  {
+                                                                                                          "type":  "number",
+                                                                                                          "format":  "double"
+                                                                                                      }
+                                                                                }
+                                                             },
+                                       "ApiResponseAnalyticsResponse":  {
+                                                                            "type":  "object",
+                                                                            "properties":  {
+                                                                                               "success":  {
+                                                                                                               "type":  "boolean"
+                                                                                                           },
+                                                                                               "message":  {
+                                                                                                               "type":  "string"
+                                                                                                           },
+                                                                                               "data":  {
+                                                                                                            "$ref":  "#/components/schemas/AnalyticsResponse"
+                                                                                                        }
+                                                                                           }
+                                                                        },
+                                       "ApiResponseListSupplierMatchResponse":  {
+                                                                                    "type":  "object",
+                                                                                    "properties":  {
+                                                                                                       "success":  {
+                                                                                                                       "type":  "boolean"
+                                                                                                                   },
+                                                                                                       "message":  {
+                                                                                                                       "type":  "string"
+                                                                                                                   },
+                                                                                                       "data":  {
+                                                                                                                    "type":  "array",
+                                                                                                                    "items":  "@{$ref=#/components/schemas/SupplierMatchResponse}"
+                                                                                                                }
+                                                                                                   }
+                                                                                },
+                                       "SupplierMatchResponse":  {
+                                                                     "type":  "object",
+                                                                     "properties":  {
+                                                                                        "supplierId":  {
+                                                                                                           "type":  "integer",
+                                                                                                           "format":  "int64"
+                                                                                                       },
+                                                                                        "supplierName":  {
+                                                                                                             "type":  "string"
+                                                                                                         },
+                                                                                        "businessName":  {
+                                                                                                             "type":  "string"
+                                                                                                         },
+                                                                                        "productName":  {
+                                                                                                            "type":  "string"
+                                                                                                        },
+                                                                                        "category":  {
+                                                                                                         "type":  "string"
+                                                                                                     },
+                                                                                        "price":  {
+                                                                                                      "type":  "number"
+                                                                                                  },
+                                                                                        "moq":  {
+                                                                                                    "type":  "integer",
+                                                                                                    "format":  "int32"
+                                                                                                },
+                                                                                        "stockQuantity":  {
+                                                                                                              "type":  "integer",
+                                                                                                              "format":  "int32"
+                                                                                                          },
+                                                                                        "leadTime":  {
+                                                                                                         "type":  "integer",
+                                                                                                         "format":  "int32"
+                                                                                                     },
+                                                                                        "rating":  {
+                                                                                                       "type":  "number",
+                                                                                                       "format":  "double"
+                                                                                                   }
+                                                                                    }
+                                                                 },
+                                       "ApiResponseListNotificationRetailer":  {
+                                                                                   "type":  "object",
+                                                                                   "properties":  {
+                                                                                                      "success":  {
+                                                                                                                      "type":  "boolean"
+                                                                                                                  },
+                                                                                                      "message":  {
+                                                                                                                      "type":  "string"
+                                                                                                                  },
+                                                                                                      "data":  {
+                                                                                                                   "type":  "array",
+                                                                                                                   "items":  "@{$ref=#/components/schemas/NotificationRetailer}"
+                                                                                                               }
+                                                                                                  }
+                                                                               },
+                                       "Category":  {
+                                                        "type":  "object",
+                                                        "properties":  {
+                                                                           "createdAt":  {
+                                                                                             "type":  "string",
+                                                                                             "format":  "date-time"
+                                                                                         },
+                                                                           "updatedAt":  {
+                                                                                             "type":  "string",
+                                                                                             "format":  "date-time"
+                                                                                         },
+                                                                           "deletedAt":  {
+                                                                                             "type":  "string",
+                                                                                             "format":  "date-time"
+                                                                                         },
+                                                                           "id":  {
+                                                                                      "type":  "integer",
+                                                                                      "format":  "int64"
+                                                                                  },
+                                                                           "name":  {
+                                                                                        "type":  "string"
+                                                                                    },
+                                                                           "description":  {
+                                                                                               "type":  "string"
+                                                                                           },
+                                                                           "products":  {
+                                                                                            "type":  "array",
+                                                                                            "items":  "@{$ref=#/components/schemas/Product}"
+                                                                                        }
+                                                                       }
+                                                    },
+                                       "NotificationRetailer":  {
+                                                                    "type":  "object",
+                                                                    "properties":  {
+                                                                                       "createdAt":  {
+                                                                                                         "type":  "string",
+                                                                                                         "format":  "date-time"
+                                                                                                     },
+                                                                                       "updatedAt":  {
+                                                                                                         "type":  "string",
+                                                                                                         "format":  "date-time"
+                                                                                                     },
+                                                                                       "deletedAt":  {
+                                                                                                         "type":  "string",
+                                                                                                         "format":  "date-time"
+                                                                                                     },
+                                                                                       "id":  {
+                                                                                                  "type":  "integer",
+                                                                                                  "format":  "int64"
+                                                                                              },
+                                                                                       "retailer":  {
+                                                                                                        "$ref":  "#/components/schemas/User"
+                                                                                                    },
+                                                                                       "product":  {
+                                                                                                       "$ref":  "#/components/schemas/Product"
+                                                                                                   },
+                                                                                       "type":  {
+                                                                                                    "type":  "string",
+                                                                                                    "enum":  "LOW_STOCK ORDER_UPDATE SYSTEM"
+                                                                                                },
+                                                                                       "message":  {
+                                                                                                       "type":  "string"
+                                                                                                   },
+                                                                                       "isRead":  {
+                                                                                                      "type":  "boolean"
+                                                                                                  },
+                                                                                       "notificationSentAt":  {
+                                                                                                                  "type":  "string",
+                                                                                                                  "format":  "date-time"
+                                                                                                              }
+                                                                                   }
+                                                                },
+                                       "Product":  {
+                                                       "type":  "object",
+                                                       "properties":  {
+                                                                          "createdAt":  {
+                                                                                            "type":  "string",
+                                                                                            "format":  "date-time"
+                                                                                        },
+                                                                          "updatedAt":  {
+                                                                                            "type":  "string",
+                                                                                            "format":  "date-time"
+                                                                                        },
+                                                                          "deletedAt":  {
+                                                                                            "type":  "string",
+                                                                                            "format":  "date-time"
+                                                                                        },
+                                                                          "id":  {
+                                                                                     "type":  "integer",
+                                                                                     "format":  "int64"
+                                                                                 },
+                                                                          "category":  {
+                                                                                           "$ref":  "#/components/schemas/Category"
+                                                                                       },
+                                                                          "name":  {
+                                                                                       "type":  "string"
+                                                                                   },
+                                                                          "description":  {
+                                                                                              "type":  "string"
+                                                                                          },
+                                                                          "sku":  {
+                                                                                      "type":  "string"
+                                                                                  },
+                                                                          "unit":  {
+                                                                                       "type":  "string"
+                                                                                   },
+                                                                          "brand":  {
+                                                                                        "type":  "string"
+                                                                                    },
+                                                                          "supplierInventories":  {
+                                                                                                      "type":  "array",
+                                                                                                      "items":  "@{$ref=#/components/schemas/SupplierInventory}"
+                                                                                                  },
+                                                                          "retailerInventories":  {
+                                                                                                      "type":  "array",
+                                                                                                      "items":  "@{$ref=#/components/schemas/RetailerInventory}"
+                                                                                                  }
+                                                                      }
+                                                   },
+                                       "RetailerInventory":  {
+                                                                 "type":  "object",
+                                                                 "properties":  {
+                                                                                    "createdAt":  {
+                                                                                                      "type":  "string",
+                                                                                                      "format":  "date-time"
+                                                                                                  },
+                                                                                    "updatedAt":  {
+                                                                                                      "type":  "string",
+                                                                                                      "format":  "date-time"
+                                                                                                  },
+                                                                                    "deletedAt":  {
+                                                                                                      "type":  "string",
+                                                                                                      "format":  "date-time"
+                                                                                                  },
+                                                                                    "id":  {
+                                                                                               "type":  "integer",
+                                                                                               "format":  "int64"
+                                                                                           },
+                                                                                    "product":  {
+                                                                                                    "$ref":  "#/components/schemas/Product"
+                                                                                                },
+                                                                                    "user":  {
+                                                                                                 "$ref":  "#/components/schemas/User"
+                                                                                             },
+                                                                                    "thresholdValue":  {
+                                                                                                           "type":  "integer",
+                                                                                                           "format":  "int32"
+                                                                                                       },
+                                                                                    "price":  {
+                                                                                                  "type":  "number"
+                                                                                              },
+                                                                                    "quantity":  {
+                                                                                                     "type":  "integer",
+                                                                                                     "format":  "int32"
+                                                                                                 }
+                                                                                }
+                                                             },
+                                       "SupplierInventory":  {
+                                                                 "type":  "object",
+                                                                 "properties":  {
+                                                                                    "createdAt":  {
+                                                                                                      "type":  "string",
+                                                                                                      "format":  "date-time"
+                                                                                                  },
+                                                                                    "updatedAt":  {
+                                                                                                      "type":  "string",
+                                                                                                      "format":  "date-time"
+                                                                                                  },
+                                                                                    "deletedAt":  {
+                                                                                                      "type":  "string",
+                                                                                                      "format":  "date-time"
+                                                                                                  },
+                                                                                    "id":  {
+                                                                                               "type":  "integer",
+                                                                                               "format":  "int64"
+                                                                                           },
+                                                                                    "product":  {
+                                                                                                    "$ref":  "#/components/schemas/Product"
+                                                                                                },
+                                                                                    "user":  {
+                                                                                                 "$ref":  "#/components/schemas/User"
+                                                                                             },
+                                                                                    "price":  {
+                                                                                                  "type":  "number"
+                                                                                              },
+                                                                                    "moq":  {
+                                                                                                "type":  "integer",
+                                                                                                "format":  "int32"
+                                                                                            },
+                                                                                    "stockQuantity":  {
+                                                                                                          "type":  "integer",
+                                                                                                          "format":  "int32"
+                                                                                                      },
+                                                                                    "availability":  {
+                                                                                                         "type":  "string",
+                                                                                                         "format":  "date"
+                                                                                                     },
+                                                                                    "leadTime":  {
+                                                                                                     "type":  "integer",
+                                                                                                     "format":  "int32"
+                                                                                                 },
+                                                                                    "isActive":  {
+                                                                                                     "type":  "boolean"
+                                                                                                 },
+                                                                                    "images":  {
+                                                                                                   "type":  "array",
+                                                                                                   "items":  "@{$ref=#/components/schemas/SupplierInventoryImage}"
+                                                                                               }
+                                                                                }
+                                                             },
+                                       "SupplierInventoryImage":  {
+                                                                      "type":  "object",
+                                                                      "properties":  {
+                                                                                         "createdAt":  {
+                                                                                                           "type":  "string",
+                                                                                                           "format":  "date-time"
+                                                                                                       },
+                                                                                         "updatedAt":  {
+                                                                                                           "type":  "string",
+                                                                                                           "format":  "date-time"
+                                                                                                       },
+                                                                                         "deletedAt":  {
+                                                                                                           "type":  "string",
+                                                                                                           "format":  "date-time"
+                                                                                                       },
+                                                                                         "id":  {
+                                                                                                    "type":  "integer",
+                                                                                                    "format":  "int64"
+                                                                                                },
+                                                                                         "supplierInventory":  {
+                                                                                                                   "$ref":  "#/components/schemas/SupplierInventory"
+                                                                                                               },
+                                                                                         "imageUrl":  {
+                                                                                                          "type":  "string"
+                                                                                                      }
+                                                                                     }
+                                                                  },
+                                       "User":  {
+                                                    "type":  "object",
+                                                    "properties":  {
+                                                                       "createdAt":  {
+                                                                                         "type":  "string",
+                                                                                         "format":  "date-time"
+                                                                                     },
+                                                                       "updatedAt":  {
+                                                                                         "type":  "string",
+                                                                                         "format":  "date-time"
+                                                                                     },
+                                                                       "deletedAt":  {
+                                                                                         "type":  "string",
+                                                                                         "format":  "date-time"
+                                                                                     },
+                                                                       "id":  {
+                                                                                  "type":  "integer",
+                                                                                  "format":  "int64"
+                                                                              },
+                                                                       "email":  {
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                       "password":  {
+                                                                                        "type":  "string"
+                                                                                    },
+                                                                       "role":  {
+                                                                                    "type":  "string",
+                                                                                    "enum":  "RETAILER SUPPLIER ADMIN"
+                                                                                },
+                                                                       "status":  {
+                                                                                      "type":  "string",
+                                                                                      "enum":  "ACTIVE PENDING BLOCKED"
+                                                                                  },
+                                                                       "profileStatus":  {
+                                                                                             "type":  "string",
+                                                                                             "enum":  "INCOMPLETE COMPLETED"
+                                                                                         },
+                                                                       "emailVerifiedAt":  {
+                                                                                               "type":  "string",
+                                                                                               "format":  "date-time"
+                                                                                           },
+                                                                       "adminVerifiedAt":  {
+                                                                                               "type":  "string",
+                                                                                               "format":  "date-time"
+                                                                                           },
+                                                                       "lastLoginAt":  {
+                                                                                           "type":  "string",
+                                                                                           "format":  "date-time"
+                                                                                       }
+                                                                   }
+                                                },
+                                       "ApiResponseListProductSummaryResponse":  {
+                                                                                     "type":  "object",
+                                                                                     "properties":  {
+                                                                                                        "success":  {
+                                                                                                                        "type":  "boolean"
+                                                                                                                    },
+                                                                                                        "message":  {
+                                                                                                                        "type":  "string"
+                                                                                                                    },
+                                                                                                        "data":  {
+                                                                                                                     "type":  "array",
+                                                                                                                     "items":  "@{$ref=#/components/schemas/ProductSummaryResponse}"
+                                                                                                                 }
+                                                                                                    }
+                                                                                 },
+                                       "ProductSummaryResponse":  {
+                                                                      "type":  "object",
+                                                                      "properties":  {
+                                                                                         "id":  {
+                                                                                                    "type":  "integer",
+                                                                                                    "format":  "int64"
+                                                                                                },
+                                                                                         "name":  {
+                                                                                                      "type":  "string"
+                                                                                                  },
+                                                                                         "description":  {
+                                                                                                             "type":  "string"
+                                                                                                         },
+                                                                                         "sku":  {
+                                                                                                     "type":  "string"
+                                                                                                 },
+                                                                                         "brand":  {
+                                                                                                       "type":  "string"
+                                                                                                   },
+                                                                                         "unit":  {
+                                                                                                      "type":  "string"
+                                                                                                  },
+                                                                                         "categoryId":  {
+                                                                                                            "type":  "integer",
+                                                                                                            "format":  "int64"
+                                                                                                        },
+                                                                                         "categoryName":  {
+                                                                                                              "type":  "string"
+                                                                                                          }
+                                                                                     }
+                                                                  },
+                                       "ApiResponseListCategoryResponse":  {
+                                                                               "type":  "object",
+                                                                               "properties":  {
+                                                                                                  "success":  {
+                                                                                                                  "type":  "boolean"
+                                                                                                              },
+                                                                                                  "message":  {
+                                                                                                                  "type":  "string"
+                                                                                                              },
+                                                                                                  "data":  {
+                                                                                                               "type":  "array",
+                                                                                                               "items":  "@{$ref=#/components/schemas/CategoryResponse}"
+                                                                                                           }
+                                                                                              }
+                                                                           },
+                                       "CategoryResponse":  {
+                                                                "type":  "object",
+                                                                "properties":  {
+                                                                                   "id":  {
+                                                                                              "type":  "integer",
+                                                                                              "format":  "int64"
+                                                                                          },
+                                                                                   "name":  {
+                                                                                                "type":  "string"
+                                                                                            },
+                                                                                   "description":  {
+                                                                                                       "type":  "string"
+                                                                                                   }
+                                                                               }
+                                                            },
+                                       "ApiResponseListProfile":  {
+                                                                      "type":  "object",
+                                                                      "properties":  {
+                                                                                         "success":  {
+                                                                                                         "type":  "boolean"
+                                                                                                     },
+                                                                                         "message":  {
+                                                                                                         "type":  "string"
+                                                                                                     },
+                                                                                         "data":  {
+                                                                                                      "type":  "array",
+                                                                                                      "items":  "@{$ref=#/components/schemas/Profile}"
+                                                                                                  }
+                                                                                     }
+                                                                  },
+                                       "Profile":  {
+                                                       "type":  "object",
+                                                       "properties":  {
+                                                                          "createdAt":  {
+                                                                                            "type":  "string",
+                                                                                            "format":  "date-time"
+                                                                                        },
+                                                                          "updatedAt":  {
+                                                                                            "type":  "string",
+                                                                                            "format":  "date-time"
+                                                                                        },
+                                                                          "deletedAt":  {
+                                                                                            "type":  "string",
+                                                                                            "format":  "date-time"
+                                                                                        },
+                                                                          "id":  {
+                                                                                     "type":  "integer",
+                                                                                     "format":  "int64"
+                                                                                 },
+                                                                          "user":  {
+                                                                                       "$ref":  "#/components/schemas/User"
+                                                                                   },
+                                                                          "firstName":  {
+                                                                                            "type":  "string"
+                                                                                        },
+                                                                          "lastName":  {
+                                                                                           "type":  "string"
+                                                                                       },
+                                                                          "businessName":  {
+                                                                                               "type":  "string"
+                                                                                           },
+                                                                          "businessType":  {
+                                                                                               "type":  "string"
+                                                                                           },
+                                                                          "mobNo":  {
+                                                                                        "type":  "string"
+                                                                                    },
+                                                                          "address":  {
+                                                                                          "type":  "string"
+                                                                                      },
+                                                                          "gst":  {
+                                                                                      "type":  "string"
+                                                                                  },
+                                                                          "city":  {
+                                                                                       "type":  "string"
+                                                                                   },
+                                                                          "state":  {
+                                                                                        "type":  "string"
+                                                                                    },
+                                                                          "pincode":  {
+                                                                                          "type":  "string"
+                                                                                      },
+                                                                          "profileImageUrl":  {
+                                                                                                  "type":  "string"
+                                                                                              }
+                                                                      }
+                                                   },
+                                       "ApiResponseMapStringLong":  {
+                                                                        "type":  "object",
+                                                                        "properties":  {
+                                                                                           "success":  {
+                                                                                                           "type":  "boolean"
+                                                                                                       },
+                                                                                           "message":  {
+                                                                                                           "type":  "string"
+                                                                                                       },
+                                                                                           "data":  {
+                                                                                                        "type":  "object",
+                                                                                                        "additionalProperties":  "@{type=integer; format=int64}"
+                                                                                                    }
+                                                                                       }
+                                                                    },
+                                       "ApiResponseListUser":  {
+                                                                   "type":  "object",
+                                                                   "properties":  {
+                                                                                      "success":  {
+                                                                                                      "type":  "boolean"
+                                                                                                  },
+                                                                                      "message":  {
+                                                                                                      "type":  "string"
+                                                                                                  },
+                                                                                      "data":  {
+                                                                                                   "type":  "array",
+                                                                                                   "items":  "@{$ref=#/components/schemas/User}"
+                                                                                               }
+                                                                                  }
+                                                               }
+                                   },
+                       "securitySchemes":  {
+                                               "bearerAuth":  {
+                                                                  "type":  "http",
+                                                                  "scheme":  "bearer",
+                                                                  "bearerFormat":  "JWT"
+                                                              }
+                                           }
+                   }
+}

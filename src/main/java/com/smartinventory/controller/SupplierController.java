@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/supplier")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('SUPPLIER')")
+@SecurityRequirement(name = "bearerAuth")
 public class SupplierController {
 
     private final UserRepository              userRepo;
