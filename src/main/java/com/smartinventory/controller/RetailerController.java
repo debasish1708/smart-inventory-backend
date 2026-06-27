@@ -339,13 +339,48 @@ public class RetailerController {
     }
 
     @GetMapping("/sales")
-    public ResponseEntity<ApiResponse<List<SaleResponse>>> getSales(Authentication auth) {
+    public ResponseEntity<ApiResponse<PageResponse<SaleResponse>>> getSales(
+            Authentication auth,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
         User user = getUser(auth);
-        List<SaleResponse> list = saleRepo.findByRetailerIdOrderBySaleDateDesc(user.getId())
-                .stream()
+        org.springframework.data.domain.Pageable pageable = 
+            org.springframework.data.domain.PageRequest.of(page, size, org.springframework.data.domain.Sort.by("saleDate").descending());
+        org.springframework.data.domain.Page<RetailerSale> salePage = saleRepo.findByRetailerId(user.getId(), pageable);
+        
+        List<SaleResponse> list = salePage.getContent().stream()
                 .map(this::toSaleResponse)
                 .collect(Collectors.toList());
-        return ResponseEntity.ok(ApiResponse.ok("Sales list fetched successfully", list));
+                
+        PageResponse<SaleResponse> pageResponse = PageResponse.<SaleResponse>builder()
+                .content(list)
+                .page(salePage.getNumber())
+                .size(salePage.getSize())
+                .totalElements(salePage.getTotalElements())
+                .totalPages(salePage.getTotalPages())
+                .last(salePage.isLast())
+                .build();
+                
+        return ResponseEntity.ok(ApiResponse.ok("Sales list fetched successfully", pageResponse));
+    }
+
+    @GetMapping("/sales/today-summary")
+    public ResponseEntity<ApiResponse<TodaySalesSummary>> getTodaySalesSummary(Authentication auth) {
+        User user = getUser(auth);
+        LocalDateTime start = LocalDate.now().atStartOfDay();
+        LocalDateTime end = LocalDate.now().atTime(java.time.LocalTime.MAX);
+        
+        BigDecimal totalAmount = saleRepo.sumTotalAmountByRetailerIdAndSaleDateBetween(user.getId(), start, end);
+        if (totalAmount == null) {
+            totalAmount = BigDecimal.ZERO;
+        }
+        long totalCount = saleRepo.countByRetailerIdAndSaleDateBetween(user.getId(), start, end);
+        
+        TodaySalesSummary summary = TodaySalesSummary.builder()
+                .totalAmount(totalAmount)
+                .totalCount(totalCount)
+                .build();
+        return ResponseEntity.ok(ApiResponse.ok("Today's sales summary fetched successfully", summary));
     }
 
     private SaleResponse toSaleResponse(RetailerSale sale) {
