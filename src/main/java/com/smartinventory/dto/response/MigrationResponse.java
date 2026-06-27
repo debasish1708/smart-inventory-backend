@@ -17,6 +17,7 @@ public class MigrationResponse {
     private int adminsCreated;
     private int retailerInventoryRecords;
     private int supplierInventoryRecords;
+    private int ratingsCreated;
     private String defaultPassword;
     private String adminEmail;
 }

@@ -119,6 +119,7 @@ public class MigrationService {
 
         int retailerInventoryCount = seedRetailerInventories(retailers, products);
         int supplierInventoryCount = seedSupplierInventories(suppliers, products);
+        int ratingsCount = seedRatings(retailers, suppliers);
 
         log.info("Migration completed successfully");
 
@@ -130,6 +131,7 @@ public class MigrationService {
             .adminsCreated(1)
             .retailerInventoryRecords(retailerInventoryCount)
             .supplierInventoryRecords(supplierInventoryCount)
+            .ratingsCreated(ratingsCount)
             .defaultPassword(DEFAULT_PASSWORD)
             .adminEmail(ADMIN_EMAIL)
             .build();
@@ -337,5 +339,55 @@ public class MigrationService {
             entityManager.clear();
         }
         return saved;
+    }
+
+    private int seedRatings(List<User> retailers, List<User> suppliers) {
+        List<Rating> ratings = new ArrayList<>();
+        ThreadLocalRandom random = ThreadLocalRandom.current();
+        
+        String[] reviews = {
+            "Excellent service, very fast delivery!",
+            "Good product quality, but slightly delayed delivery.",
+            "Best wholesale prices in the region.",
+            "Highly recommended supplier!",
+            "Satisfactory products and decent MOQ.",
+            "Great communication and reliable packaging.",
+            "MOQ is a bit high, but product quality is top-notch.",
+            "Prompt response and very polite staff.",
+            "Good value for money.",
+            "Items received in perfect condition. Thank you!"
+        };
+
+        for (User supplier : suppliers) {
+            // Seed 3 to 6 random ratings per supplier
+            int ratingCount = random.nextInt(3, 7);
+            List<User> pickedRetailers = new ArrayList<>();
+            
+            for (int i = 0; i < ratingCount; i++) {
+                User retailer = retailers.get(random.nextInt(retailers.size()));
+                if (pickedRetailers.contains(retailer)) {
+                    continue;
+                }
+                pickedRetailers.add(retailer);
+                
+                int ratingVal = random.nextInt(3, 6); // ratings between 3 and 5 stars
+                if (random.nextDouble() < 0.1) {
+                    ratingVal = 2; // 10% chance of a 2-star rating
+                }
+                
+                String review = reviews[random.nextInt(reviews.length)];
+                
+                Rating rating = Rating.builder()
+                        .supplier(supplier)
+                        .retailer(retailer)
+                        .rating(ratingVal)
+                        .review(review)
+                        .build();
+                ratings.add(rating);
+            }
+        }
+        
+        saveInBatches(ratings, ratingRepository::saveAll);
+        return ratings.size();
     }
 }
