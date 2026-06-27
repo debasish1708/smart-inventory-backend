@@ -269,6 +269,7 @@ public class MigrationService {
             .city(CITIES[idx])
             .state(STATES[idx])
             .pincode(String.format("%06d", 400000 + locationIndex))
+            .profileImageUrl(user.getRole() == Role.ADMIN ? "smart_inventory_logo.png" : null)
             .build();
         profileRepository.save(profile);
     }
