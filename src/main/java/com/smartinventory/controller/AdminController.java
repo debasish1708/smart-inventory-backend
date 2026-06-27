@@ -1,13 +1,12 @@
 package com.smartinventory.controller;
 
+import com.smartinventory.dto.response.AdminAnalyticsResponse;
 import com.smartinventory.dto.response.ApiResponse;
 import com.smartinventory.dto.response.ProfileResponse;
-import com.smartinventory.entity.Profile;
-import com.smartinventory.entity.User;
+import com.smartinventory.entity.*;
 import com.smartinventory.enums.UserStatus;
 import com.smartinventory.exception.BadRequestException;
-import com.smartinventory.repository.ProfileRepository;
-import com.smartinventory.repository.UserRepository;
+import com.smartinventory.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,8 +14,11 @@ import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.math.BigDecimal;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -25,8 +27,13 @@ import java.util.Map;
 @SecurityRequirement(name = "bearerAuth")
 public class AdminController {
 
-    private final ProfileRepository profileRepository;
-    private final UserRepository    userRepository;
+    private final ProfileRepository      profileRepository;
+    private final UserRepository         userRepository;
+    private final SubscriptionRepository subscriptionRepository;
+    private final PaymentRepository      paymentRepository;
+    private final RetailerSaleRepository retailerSaleRepository;
+    private final OrderRepository        orderRepository;
+    private final OrderItemRepository    orderItemRepository;
 
     @GetMapping("/pending-users")
     public ResponseEntity<ApiResponse<List<User>>> getPendingUsers() {
@@ -110,5 +117,77 @@ public class AdminController {
                 "active", active,
                 "blocked", blocked
         )));
+    }
+
+    @GetMapping("/analytics")
+    public ResponseEntity<ApiResponse<AdminAnalyticsResponse>> getAnalytics() {
+        long totalUsers   = userRepository.count();
+        long pendingUsers = userRepository.findByStatus(UserStatus.PENDING).size();
+        long activeUsers  = userRepository.findByStatus(UserStatus.ACTIVE).size();
+        long blockedUsers = userRepository.findByStatus(UserStatus.BLOCKED).size();
+
+        long subscriptionCount = subscriptionRepository.count();
+        BigDecimal subscriptionRevenue = paymentRepository.findAll().stream()
+                .filter(p -> "SUCCESS".equalsIgnoreCase(p.getStatus()))
+                .map(Payment::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        long retailerSalesCount = retailerSaleRepository.count();
+        BigDecimal retailerSalesRevenue = retailerSaleRepository.findAll().stream()
+                .map(RetailerSale::getTotalAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        long supplierSalesCount = orderRepository.count();
+        BigDecimal supplierSalesRevenue = orderItemRepository.findAll().stream()
+                .filter(oi -> oi.getOrder() != null && !"CANCELLED".equalsIgnoreCase(oi.getOrder().getStatus()))
+                .map(oi -> oi.getPrice().multiply(BigDecimal.valueOf(oi.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("MMM");
+        
+        List<AdminAnalyticsResponse.MonthlyRevenue> monthlyRetailerRevenue = new ArrayList<>();
+        List<AdminAnalyticsResponse.MonthlyRevenue> monthlySupplierRevenue = new ArrayList<>();
+
+        LocalDateTime now = LocalDateTime.now();
+        List<RetailerSale> retailerSalesList = retailerSaleRepository.findAll();
+        List<OrderItem> orderItemsList = orderItemRepository.findAll().stream()
+                .filter(oi -> oi.getOrder() != null && !"CANCELLED".equalsIgnoreCase(oi.getOrder().getStatus()))
+                .collect(Collectors.toList());
+
+        for (int i = 5; i >= 0; i--) {
+            LocalDateTime monthStart = now.minusMonths(i).withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
+            LocalDateTime monthEnd = monthStart.plusMonths(1);
+            String monthName = monthStart.format(formatter);
+
+            BigDecimal retSales = retailerSalesList.stream()
+                    .filter(s -> s.getSaleDate().isAfter(monthStart) && s.getSaleDate().isBefore(monthEnd))
+                    .map(RetailerSale::getTotalAmount)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            BigDecimal supSales = orderItemsList.stream()
+                    .filter(oi -> oi.getOrder().getOrderDate().isAfter(monthStart) && oi.getOrder().getOrderDate().isBefore(monthEnd))
+                    .map(oi -> oi.getPrice().multiply(BigDecimal.valueOf(oi.getQuantity())))
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            monthlyRetailerRevenue.add(new AdminAnalyticsResponse.MonthlyRevenue(monthName, retSales));
+            monthlySupplierRevenue.add(new AdminAnalyticsResponse.MonthlyRevenue(monthName, supSales));
+        }
+
+        AdminAnalyticsResponse response = AdminAnalyticsResponse.builder()
+                .totalUsers(totalUsers)
+                .activeUsers(activeUsers)
+                .pendingUsers(pendingUsers)
+                .blockedUsers(blockedUsers)
+                .subscriptionCount(subscriptionCount)
+                .subscriptionRevenue(subscriptionRevenue)
+                .retailerSalesCount(retailerSalesCount)
+                .retailerSalesRevenue(retailerSalesRevenue)
+                .supplierSalesCount(supplierSalesCount)
+                .supplierSalesRevenue(supplierSalesRevenue)
+                .monthlyRetailerRevenue(monthlyRetailerRevenue)
+                .monthlySupplierRevenue(monthlySupplierRevenue)
+                .build();
+
+        return ResponseEntity.ok(ApiResponse.ok("Admin Analytics Fetched Successfully", response));
     }
 }

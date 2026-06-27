@@ -88,6 +88,10 @@ public class MigrationService {
     private final PaymentRepository paymentRepository;
     private final PasswordEncoder passwordEncoder;
     private final EntityManager entityManager;
+    private final RetailerProductRecommendationRepository retailerProductRecommendationRepository;
+    private final RetailerSaleItemRepository retailerSaleItemRepository;
+    private final RetailerSaleRepository retailerSaleRepository;
+    private final RetailerSalesAnalyticsRepository retailerSalesAnalyticsRepository;
 
     @Transactional
     public MigrationResponse runMigration(boolean force) {
@@ -138,7 +142,11 @@ public class MigrationService {
     }
 
     private void clearAllData() {
+        retailerSalesAnalyticsRepository.deleteAllInBatch();
+        retailerProductRecommendationRepository.deleteAllInBatch();
         notificationRepository.deleteAllInBatch();
+        retailerSaleItemRepository.deleteAllInBatch();
+        retailerSaleRepository.deleteAllInBatch();
         orderItemRepository.deleteAllInBatch();
         orderRepository.deleteAllInBatch();
         ratingRepository.deleteAllInBatch();

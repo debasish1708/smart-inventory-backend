@@ -3,6 +3,7 @@ package com.smartinventory.controller;
 import com.smartinventory.dto.request.InventoryRequest;
 import com.smartinventory.dto.response.*;
 import com.smartinventory.entity.*;
+import com.smartinventory.enums.SubscriptionPlan;
 import com.smartinventory.exception.BadRequestException;
 import com.smartinventory.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,8 @@ public class SupplierController {
     private final SubscriptionRepository      subRepo;
     private final ProductRepository           productRepo;
     private final CategoryRepository          categoryRepo;
+    private final RetailerInventoryRepository retailerInventoryRepo;
+    private final PaymentRepository           paymentRepo;
 
     private User getUser(Authentication auth) {
         return userRepo.findByEmail(auth.getName())
@@ -97,6 +100,7 @@ public class SupplierController {
     }
 
     @PutMapping("/orders/{id}/status")
+    @org.springframework.transaction.annotation.Transactional
     public ResponseEntity<ApiResponse<String>> updateOrderStatus(
             @PathVariable Long id, @RequestParam String status) {
         Order order = orderRepo.findById(id)
@@ -105,10 +109,80 @@ public class SupplierController {
         if (!allowed.contains(status.toUpperCase()))
             throw new BadRequestException("Invalid status: " + status);
         order.setStatus(status.toUpperCase());
-        if ("DELIVERED".equals(status.toUpperCase()))
+        if ("DELIVERED".equals(status.toUpperCase())) {
             order.setDeliveredDate(LocalDateTime.now());
+            // Update retailer inventory
+            List<OrderItem> items = orderItemRepo.findByOrderId(order.getId());
+            for (OrderItem oi : items) {
+                if (oi.getProduct() != null) {
+                    RetailerInventory ri = retailerInventoryRepo
+                        .findByUserIdAndProductId(order.getRetailer().getId(), oi.getProduct().getId())
+                        .orElse(null);
+                    if (ri != null) {
+                        ri.setQuantity(ri.getQuantity() + oi.getQuantity());
+                        retailerInventoryRepo.save(ri);
+                    } else {
+                        ri = RetailerInventory.builder()
+                            .user(order.getRetailer())
+                            .product(oi.getProduct())
+                            .quantity(oi.getQuantity())
+                            .price(oi.getPrice())
+                            .thresholdValue(10)
+                            .build();
+                        retailerInventoryRepo.save(ri);
+                    }
+                }
+            }
+        }
         orderRepo.save(order);
         return ResponseEntity.ok(ApiResponse.ok("Order status updated to " + status));
+    }
+
+    @PostMapping("/subscription/upgrade")
+    @org.springframework.transaction.annotation.Transactional
+    public ResponseEntity<ApiResponse<SubscriptionResponse>> upgradeSubscription(
+            Authentication auth, @RequestParam("plan") String planName) {
+        User user = getUser(auth);
+        
+        BigDecimal amount = BigDecimal.ZERO;
+        if ("BASIC".equalsIgnoreCase(planName)) amount = BigDecimal.valueOf(499);
+        else if ("PREMIUM".equalsIgnoreCase(planName)) amount = BigDecimal.valueOf(1499);
+        
+        Payment payment = Payment.builder()
+                .user(user)
+                .amount(amount)
+                .paymentGateway("SIMULATION")
+                .transactionId("TXN-" + System.currentTimeMillis())
+                .status("SUCCESS")
+                .build();
+        paymentRepo.save(payment);
+
+        List<Subscription> activeSubs = subRepo.findByUserId(user.getId()).stream()
+                .filter(s -> "ACTIVE".equalsIgnoreCase(s.getStatus()))
+                .collect(Collectors.toList());
+        for (Subscription s : activeSubs) {
+            s.setStatus("EXPIRED");
+            subRepo.save(s);
+        }
+
+        Subscription sub = Subscription.builder()
+                .user(user)
+                .payment(payment)
+                .planName(SubscriptionPlan.valueOf(planName.toUpperCase()))
+                .status("ACTIVE")
+                .startDateTime(LocalDateTime.now())
+                .endDateTime(LocalDateTime.now().plusMonths(1))
+                .build();
+        subRepo.save(sub);
+
+        SubscriptionResponse resp = SubscriptionResponse.builder()
+                .id(sub.getId())
+                .planName(sub.getPlanName().name())
+                .status(sub.getStatus())
+                .startDateTime(sub.getStartDateTime())
+                .endDateTime(sub.getEndDateTime())
+                .build();
+        return ResponseEntity.ok(ApiResponse.ok("Subscription upgraded successfully", resp));
     }
 
     // ── RATINGS ────────────────────────────────────────────────────────────

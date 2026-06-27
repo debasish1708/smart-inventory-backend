@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 @Data @Builder @NoArgsConstructor @AllArgsConstructor
 public class SupplierMatchResponse {
+    private Long       productId;
     private Long       supplierId;
     private String     supplierName;
     private String     businessName;

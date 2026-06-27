@@ -6,10 +6,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RetailerInventoryRepository extends JpaRepository<RetailerInventory, Long> {
 
     @Query("SELECT r FROM RetailerInventory r WHERE r.quantity <= r.thresholdValue")
     List<RetailerInventory> findAllLowStockItems();
+
+    Optional<RetailerInventory> findByUserIdAndProductId(Long userId, Long productId);
 }
