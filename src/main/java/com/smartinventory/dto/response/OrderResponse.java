@@ -13,4 +13,5 @@ public class OrderResponse {
     private String          retailerEmail;
     private List<OrderItemResponse> items;
     private java.math.BigDecimal totalAmount;
+    private Boolean         reviewed;
 }

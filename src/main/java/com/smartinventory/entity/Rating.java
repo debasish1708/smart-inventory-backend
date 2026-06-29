@@ -26,6 +26,10 @@ public class Rating extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String review;
 
+    @OneToOne
+    @JoinColumn(name = "orderid")
+    private Order order;
+
     @OneToMany(mappedBy = "rating", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<RatingImage> images;
 }

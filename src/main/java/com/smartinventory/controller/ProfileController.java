@@ -71,4 +71,27 @@ public class ProfileController {
             return ResponseEntity.internalServerError().build();
         }
     }
+
+    @GetMapping("/image/ratings/{filename}")
+    public ResponseEntity<org.springframework.core.io.Resource> getRatingImage(
+            @PathVariable("filename") String filename) {
+        try {
+            java.nio.file.Path filePath = java.nio.file.Paths.get(System.getProperty("user.dir"), "images/ratings").resolve(filename).normalize();
+            org.springframework.core.io.Resource resource = new org.springframework.core.io.UrlResource(filePath.toUri());
+            if (resource.exists()) {
+                String contentType = "image/jpeg";
+                if (filename.toLowerCase().endsWith(".png")) contentType = "image/png";
+                else if (filename.toLowerCase().endsWith(".gif")) contentType = "image/gif";
+                else if (filename.toLowerCase().endsWith(".webp")) contentType = "image/webp";
+                
+                return ResponseEntity.ok()
+                        .contentType(org.springframework.http.MediaType.parseMediaType(contentType))
+                        .body(resource);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 }

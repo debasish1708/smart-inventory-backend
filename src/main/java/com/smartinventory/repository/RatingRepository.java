@@ -10,6 +10,7 @@ import java.util.List;
 public interface RatingRepository extends JpaRepository<Rating, Long> {
     List<Rating> findBySupplierId(Long supplierId);
     List<Rating> findByRetailerId(Long retailerId);
+    boolean existsByOrderId(Long orderId);
 
     @Query("SELECT COALESCE(AVG(r.rating), 0.0) FROM Rating r WHERE r.supplier.id = :supplierId")
     Double avgRatingForSupplier(Long supplierId);

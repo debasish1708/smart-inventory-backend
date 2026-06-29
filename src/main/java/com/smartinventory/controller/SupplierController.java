@@ -221,7 +221,9 @@ public class SupplierController {
             .map(r -> RatingResponse.builder()
                 .id(r.getId()).rating(r.getRating()).review(r.getReview())
                 .retailerEmail(r.getRetailer() != null ? r.getRetailer().getEmail() : null)
-                .createdAt(r.getCreatedAt()).build())
+                .createdAt(r.getCreatedAt())
+                .images(r.getImages() != null ? r.getImages().stream().map(RatingImage::getImageUrl).collect(Collectors.toList()) : java.util.Collections.emptyList())
+                .build())
             .collect(Collectors.toList());
         return ResponseEntity.ok(ApiResponse.ok("Ratings", list));
     }
@@ -353,6 +355,8 @@ public class SupplierController {
             .orderDate(o.getOrderDate()).deliveredDate(o.getDeliveredDate())
             .supplierEmail(o.getSupplier() != null ? o.getSupplier().getEmail() : null)
             .retailerEmail(o.getRetailer() != null ? o.getRetailer().getEmail() : null)
-            .items(items).totalAmount(total).build();
+            .items(items).totalAmount(total)
+            .reviewed(ratingRepo.existsByOrderId(o.getId()))
+            .build();
     }
 }

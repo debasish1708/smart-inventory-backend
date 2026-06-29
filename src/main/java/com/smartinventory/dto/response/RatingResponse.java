@@ -10,4 +10,5 @@ public class RatingResponse {
     private String        supplierEmail;
     private String        retailerEmail;
     private LocalDateTime createdAt;
+    private java.util.List<String> images;
 }

@@ -137,7 +137,9 @@ public class RetailerController {
             .stream().map(r -> RatingResponse.builder()
                 .id(r.getId()).rating(r.getRating()).review(r.getReview())
                 .supplierEmail(r.getSupplier() != null ? r.getSupplier().getEmail() : null)
-                .createdAt(r.getCreatedAt()).build())
+                .createdAt(r.getCreatedAt())
+                .images(r.getImages() != null ? r.getImages().stream().map(RatingImage::getImageUrl).collect(Collectors.toList()) : new ArrayList<>())
+                .build())
             .collect(Collectors.toList());
         return ResponseEntity.ok(ApiResponse.ok("Ratings", list));
     }
@@ -236,7 +238,9 @@ public class RetailerController {
             .orderDate(o.getOrderDate()).deliveredDate(o.getDeliveredDate())
             .supplierEmail(o.getSupplier() != null ? o.getSupplier().getEmail() : null)
             .retailerEmail(o.getRetailer() != null ? o.getRetailer().getEmail() : null)
-            .items(items).totalAmount(total).build();
+            .items(items).totalAmount(total)
+            .reviewed(ratingRepo.existsByOrderId(o.getId()))
+            .build();
     }
 
     private SupplierMatchResponse toMatchResponse(SupplierInventory si) {
@@ -407,6 +411,101 @@ public class RetailerController {
         orderItemRepo.save(item);
 
         return ResponseEntity.ok(ApiResponse.ok("Order created successfully", toOrderResponse(order)));
+    }
+
+    @PostMapping(value = "/orders/{id}/review", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
+    @org.springframework.transaction.annotation.Transactional
+    public ResponseEntity<ApiResponse<RatingResponse>> addOrderReview(
+            Authentication auth,
+            @PathVariable Long id,
+            @RequestParam("rating") Integer rating,
+            @RequestParam("review") String review,
+            @RequestParam(value = "files", required = false) List<org.springframework.web.multipart.MultipartFile> files) {
+        User retailer = getUser(auth);
+        Order order = orderRepo.findById(id)
+                .orElseThrow(() -> new BadRequestException("Order not found"));
+
+        if (!order.getRetailer().getId().equals(retailer.getId())) {
+            throw new BadRequestException("You are not authorized to review this order");
+        }
+
+        if (!"DELIVERED".equals(order.getStatus())) {
+            throw new BadRequestException("You can only review delivered orders");
+        }
+
+        if (order.getDeliveredDate() == null) {
+            throw new BadRequestException("Order delivery date is missing");
+        }
+
+        if (order.getDeliveredDate().plusDays(7).isBefore(LocalDateTime.now())) {
+            throw new BadRequestException("Review period has expired (must be within 7 days of delivery)");
+        }
+
+        if (ratingRepo.existsByOrderId(order.getId())) {
+            throw new BadRequestException("This order has already been reviewed");
+        }
+
+        if (rating < 1 || rating > 5) {
+            throw new BadRequestException("Rating must be between 1 and 5");
+        }
+
+        Rating ratingEntity = Rating.builder()
+                .supplier(order.getSupplier())
+                .retailer(retailer)
+                .rating(rating)
+                .review(review)
+                .order(order)
+                .build();
+        
+        ratingRepo.save(ratingEntity);
+
+        List<RatingImage> ratingImages = new ArrayList<>();
+        if (files != null && !files.isEmpty()) {
+            java.io.File directory = new java.io.File(System.getProperty("user.dir"), "images/ratings");
+            if (!directory.exists()) {
+                directory.mkdirs();
+            }
+
+            for (org.springframework.web.multipart.MultipartFile file : files) {
+                if (file.isEmpty()) continue;
+                String originalFilename = file.getOriginalFilename();
+                String ext = "";
+                if (originalFilename != null && originalFilename.contains(".")) {
+                    ext = originalFilename.substring(originalFilename.lastIndexOf("."));
+                }
+                String uniqueFilename = "rating_" + ratingEntity.getId() + "_" + System.currentTimeMillis() + "_" + (int)(Math.random() * 1000) + ext;
+                java.io.File destFile = new java.io.File(directory, uniqueFilename);
+                try {
+                    file.transferTo(destFile);
+                } catch (Exception e) {
+                    throw new BadRequestException("Failed to save image file: " + e.getMessage());
+                }
+
+                RatingImage ratingImage = RatingImage.builder()
+                        .rating(ratingEntity)
+                        .imageUrl(uniqueFilename)
+                        .build();
+                ratingImages.add(ratingImage);
+            }
+            ratingEntity.setImages(ratingImages);
+            ratingRepo.save(ratingEntity);
+        }
+
+        List<String> imageUrls = ratingImages.stream()
+                .map(RatingImage::getImageUrl)
+                .collect(Collectors.toList());
+
+        RatingResponse resp = RatingResponse.builder()
+                .id(ratingEntity.getId())
+                .rating(ratingEntity.getRating())
+                .review(ratingEntity.getReview())
+                .supplierEmail(order.getSupplier().getEmail())
+                .retailerEmail(retailer.getEmail())
+                .createdAt(ratingEntity.getCreatedAt())
+                .images(imageUrls)
+                .build();
+
+        return ResponseEntity.ok(ApiResponse.ok("Review submitted successfully", resp));
     }
 
     private List<String> getUnexpiredPlanNames(User user) {
