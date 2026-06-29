@@ -256,7 +256,9 @@ public class RetailerController {
             .category(si.getProduct() != null && si.getProduct().getCategory() != null ? si.getProduct().getCategory().getName() : "—")
             .price(si.getPrice()).moq(si.getMoq())
             .stockQuantity(si.getStockQuantity()).leadTime(si.getLeadTime())
-            .rating(avgRating != null ? avgRating : 0.0).build();
+            .rating(avgRating != null ? avgRating : 0.0)
+            .profileImageUrl(profile != null ? profile.getProfileImageUrl() : null)
+            .build();
     }
 
     // ── SALES & TRANSACTIONS ───────────────────────────────────────────────

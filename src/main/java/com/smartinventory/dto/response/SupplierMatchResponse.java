@@ -15,4 +15,5 @@ public class SupplierMatchResponse {
     private Integer    stockQuantity;
     private Integer    leadTime;
     private Double     rating;
+    private String     profileImageUrl;
 }
