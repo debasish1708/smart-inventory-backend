@@ -392,6 +392,20 @@ public class MigrationService {
                         .rating(ratingVal)
                         .review(review)
                         .build();
+
+                List<RatingImage> ratingImages = new ArrayList<>();
+                if (random.nextDouble() < 0.4) { // 40% chance of images
+                    int imgCount = random.nextInt(1, 4); // 1 to 3 images
+                    for (int j = 0; j < imgCount; j++) {
+                        String sampleImg = "sample_rating_" + (random.nextInt(1, 5)) + ".jpg";
+                        RatingImage ratingImage = RatingImage.builder()
+                                .rating(rating)
+                                .imageUrl(sampleImg)
+                                .build();
+                        ratingImages.add(ratingImage);
+                    }
+                }
+                rating.setImages(ratingImages);
                 ratings.add(rating);
             }
         }
