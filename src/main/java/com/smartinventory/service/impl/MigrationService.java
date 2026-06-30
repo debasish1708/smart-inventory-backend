@@ -124,6 +124,7 @@ public class MigrationService {
         int retailerInventoryCount = seedRetailerInventories(retailers, products);
         int supplierInventoryCount = seedSupplierInventories(suppliers, products);
         int ratingsCount = seedRatings(retailers, suppliers);
+        seedOrdersAndSales(retailers, suppliers, products);
 
         log.info("Migration completed successfully");
 
@@ -415,5 +416,95 @@ public class MigrationService {
         
         saveInBatches(ratings, ratingRepository::saveAll);
         return ratings.size();
+    }
+
+    private void seedOrdersAndSales(List<User> retailers, List<User> suppliers, List<Product> products) {
+        log.info("Seeding orders and sales for analytics...");
+        ThreadLocalRandom random = ThreadLocalRandom.current();
+        List<Order> orders = new ArrayList<>();
+        List<OrderItem> orderItems = new ArrayList<>();
+        List<RetailerSale> sales = new ArrayList<>();
+        List<RetailerSaleItem> saleItems = new ArrayList<>();
+        
+        // Seed B2B supplier orders
+        for (User retailer : retailers) {
+            // Seed 8 to 15 orders per retailer
+            int numOrders = random.nextInt(8, 16);
+            for (int i = 0; i < numOrders; i++) {
+                User supplier = suppliers.get(random.nextInt(suppliers.size()));
+                // Distribute orders across last 6 months
+                LocalDateTime orderDate = LocalDateTime.now().minusDays(random.nextInt(0, 180));
+                String status = random.nextDouble() < 0.8 ? "DELIVERED" : "PENDING";
+                LocalDateTime deliveredDate = "DELIVERED".equals(status) ? orderDate.plusDays(random.nextInt(1, 5)) : null;
+                
+                Order order = Order.builder()
+                        .retailer(retailer)
+                        .supplier(supplier)
+                        .orderDate(orderDate)
+                        .deliveredDate(deliveredDate)
+                        .status(status)
+                        .build();
+                orders.add(order);
+            }
+        }
+        orderRepository.saveAll(orders);
+        
+        // Seed order items
+        for (Order order : orders) {
+            int numItems = random.nextInt(1, 4);
+            for (int i = 0; i < numItems; i++) {
+                Product product = products.get(random.nextInt(products.size()));
+                int qty = random.nextInt(10, 50);
+                BigDecimal price = randomPrice(100, 1500);
+                OrderItem item = OrderItem.builder()
+                        .order(order)
+                        .product(product)
+                        .quantity(qty)
+                        .price(price)
+                        .unit(product.getUnit())
+                        .build();
+                orderItems.add(item);
+            }
+        }
+        orderItemRepository.saveAll(orderItems);
+        
+        // Seed retailer customer sales
+        for (User retailer : retailers) {
+            // Seed 30 to 60 sales per retailer
+            int numSales = random.nextInt(30, 61);
+            for (int i = 0; i < numSales; i++) {
+                LocalDateTime saleDate = LocalDateTime.now().minusDays(random.nextInt(0, 180));
+                RetailerSale sale = RetailerSale.builder()
+                        .retailer(retailer)
+                        .saleDate(saleDate)
+                        .totalAmount(BigDecimal.ZERO)
+                        .build();
+                sales.add(sale);
+            }
+        }
+        retailerSaleRepository.saveAll(sales);
+        
+        // Seed sale items and compute totals
+        for (RetailerSale sale : sales) {
+            int numItems = random.nextInt(1, 5);
+            BigDecimal totalAmount = BigDecimal.ZERO;
+            for (int i = 0; i < numItems; i++) {
+                Product product = products.get(random.nextInt(products.size()));
+                int qty = random.nextInt(1, 6);
+                BigDecimal price = randomPrice(150, 2000);
+                RetailerSaleItem item = RetailerSaleItem.builder()
+                        .retailerSale(sale)
+                        .product(product)
+                        .quantity(qty)
+                        .price(price)
+                        .unit(product.getUnit())
+                        .build();
+                saleItems.add(item);
+                totalAmount = totalAmount.add(price.multiply(BigDecimal.valueOf(qty)));
+            }
+            sale.setTotalAmount(totalAmount);
+        }
+        retailerSaleItemRepository.saveAll(saleItems);
+        retailerSaleRepository.saveAll(sales);
     }
 }

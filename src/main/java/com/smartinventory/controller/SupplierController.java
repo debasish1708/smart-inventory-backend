@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -231,7 +233,7 @@ public class SupplierController {
     // ── ANALYTICS ──────────────────────────────────────────────────────────
 
     @GetMapping("/analytics")
-    public ResponseEntity<ApiResponse<AnalyticsResponse>> getAnalytics(Authentication auth) {
+    public ResponseEntity<ApiResponse<SupplierAnalyticsResponse>> getAnalytics(Authentication auth) {
         User user = getUser(auth);
         long totalOrders = orderRepo.countBySupplierId(user.getId());
         BigDecimal totalRevenue = orderRepo.sumRevenueForSupplier(user.getId());
@@ -248,9 +250,60 @@ public class SupplierController {
             .map(java.util.Map.Entry::getKey)
             .orElse("—");
 
-        return ResponseEntity.ok(ApiResponse.ok("Analytics", AnalyticsResponse.builder()
-            .totalOrders(totalOrders).totalRevenue(totalRevenue)
-            .topProduct(topProduct).monthlyGrowth(avgRating != null ? avgRating : 0.0).build()));
+        // 1. Monthly sales trend (last 6 months)
+        LocalDate today = LocalDate.now();
+        List<SupplierAnalyticsResponse.MonthlySalesTrend> trendList = new ArrayList<>();
+        
+        for (int i = 5; i >= 0; i--) {
+            LocalDate targetDate = today.minusMonths(i);
+            String monthLabel = targetDate.getMonth().getDisplayName(java.time.format.TextStyle.SHORT, java.util.Locale.ENGLISH);
+            
+            LocalDateTime startOfMonth = targetDate.withDayOfMonth(1).atStartOfDay();
+            LocalDateTime endOfMonth = targetDate.withDayOfMonth(targetDate.lengthOfMonth()).atTime(java.time.LocalTime.MAX);
+            
+            List<Order> monthOrders = orderRepo.findBySupplierIdOrderByOrderDateDesc(user.getId()).stream()
+                .filter(o -> "DELIVERED".equalsIgnoreCase(o.getStatus()))
+                .filter(o -> o.getDeliveredDate() != null && !o.getDeliveredDate().isBefore(startOfMonth) && !o.getDeliveredDate().isAfter(endOfMonth))
+                .collect(Collectors.toList());
+
+            BigDecimal monthSales = BigDecimal.ZERO;
+            for (Order o : monthOrders) {
+                List<OrderItem> items = orderItemRepo.findByOrderId(o.getId());
+                BigDecimal totalOrderAmt = items.stream()
+                    .map(oi -> (oi.getPrice() != null && oi.getQuantity() != null)
+                        ? oi.getPrice().multiply(BigDecimal.valueOf(oi.getQuantity())) : BigDecimal.ZERO)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+                monthSales = monthSales.add(totalOrderAmt);
+            }
+            
+            trendList.add(new SupplierAnalyticsResponse.MonthlySalesTrend(monthLabel, monthSales, 0.0));
+        }
+
+        // MoM growth
+        for (int i = 1; i < trendList.size(); i++) {
+            BigDecimal prevSales = trendList.get(i - 1).getSales();
+            BigDecimal currSales = trendList.get(i).getSales();
+            double growth = 0.0;
+            if (prevSales.compareTo(BigDecimal.ZERO) > 0) {
+                growth = currSales.subtract(prevSales)
+                    .multiply(BigDecimal.valueOf(100))
+                    .divide(prevSales, 1, java.math.RoundingMode.HALF_UP)
+                    .doubleValue();
+            } else if (currSales.compareTo(BigDecimal.ZERO) > 0) {
+                growth = 100.0;
+            }
+            trendList.get(i).setGrowth(growth);
+        }
+
+        SupplierAnalyticsResponse resp = SupplierAnalyticsResponse.builder()
+            .totalOrders(totalOrders)
+            .totalRevenue(totalRevenue)
+            .topProduct(topProduct)
+            .avgRating(avgRating != null ? avgRating : 0.0)
+            .monthlySalesTrend(trendList)
+            .build();
+
+        return ResponseEntity.ok(ApiResponse.ok("Analytics", resp));
     }
 
     // ── SUBSCRIPTION ───────────────────────────────────────────────────────
